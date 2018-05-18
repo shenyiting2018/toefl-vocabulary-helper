@@ -1,12 +1,30 @@
 package com.yiting.toeflvoc.models;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="root_alias_map")
 public class RootAliasMap {
+	@Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
 	
-	private Integer rootId;
+	@ManyToOne
+	@JoinColumn(name="root_id")
+	private Root root;
 	
-	private Integer aliasId;
+	@ManyToOne
+	@JoinColumn(name="alias_id")
+	private Alias alias;
 	
+	@Column(name="description")
 	private String description;
 
 	public Integer getId() {
@@ -17,20 +35,20 @@ public class RootAliasMap {
 		this.id = id;
 	}
 
-	public Integer getRootId() {
-		return rootId;
+	public Root getRoot() {
+		return root;
 	}
 
-	public void setRootId(Integer rootId) {
-		this.rootId = rootId;
+	public void setRoot(Root root) {
+		this.root = root;
 	}
 
-	public Integer getAliasId() {
-		return aliasId;
+	public Alias getAlias() {
+		return alias;
 	}
 
-	public void setAliasId(Integer aliasId) {
-		this.aliasId = aliasId;
+	public void setAlias(Alias alias) {
+		this.alias = alias;
 	}
 
 	public String getDescription() {
