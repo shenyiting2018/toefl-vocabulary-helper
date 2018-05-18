@@ -4,5 +4,5 @@ CREATE TABLE root(
 	meaning VARCHAR(60000) NOT NULL,
 	UNIQUE KEY(root_string),
 	PRIMARY KEY(id)
-);
+) ENGINE INNODB;
 
