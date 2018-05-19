@@ -1,9 +1,10 @@
 package com.yiting.toeflvoc.models;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.yiting.toeflvoc.utils.StringListConverter;
 
 @Entity
 @Table(name="root")
@@ -25,9 +28,9 @@ public class Root {
 	private String rootString;
 	
 	@NotNull
-	@ElementCollection
+	@Convert(converter = StringListConverter.class)
 	@Column(name="meaning")
-	private List<String> meaning;
+	private String meaning;
 
 	public Integer getId() {
 		return id;
@@ -42,15 +45,15 @@ public class Root {
 	}
 
 	public void setRootString(String rootString) {
-		this.rootString = rootString;
+	    this.rootString = rootString;
 	}
 
 	public List<String> getMeaning() {
-		return meaning;
+		return Arrays.asList(this.meaning.split(","));
 	}
 
 	public void setMeaning(List<String> meaning) {
-		this.meaning = meaning;
+		this.meaning = String.join(",", meaning);
 	}
 
 }
