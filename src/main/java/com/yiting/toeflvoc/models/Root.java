@@ -28,9 +28,9 @@ public class Root {
 	private String rootString;
 	
 	@NotNull
-	@Convert(converter = StringListConverter.class)
 	@Column(name="meaning")
-	private String meaning;
+	@Convert(converter = StringListConverter.class)
+	private List<String> meaning;
 
 	public Integer getId() {
 		return id;
@@ -49,11 +49,10 @@ public class Root {
 	}
 
 	public List<String> getMeaning() {
-		return Arrays.asList(this.meaning.split(","));
+		return meaning;
 	}
 
 	public void setMeaning(List<String> meaning) {
-		this.meaning = String.join(",", meaning);
+		this.meaning = meaning;
 	}
-
 }

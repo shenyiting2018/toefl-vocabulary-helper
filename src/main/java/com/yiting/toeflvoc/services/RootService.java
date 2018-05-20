@@ -2,6 +2,10 @@ package com.yiting.toeflvoc.services;
 
 import java.util.List;
 
+import javax.persistence.NoResultException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,10 +17,18 @@ import com.yiting.toeflvoc.models.Root;
 public class RootService {
 	@Autowired
 	private RootRepository rootRepo;
-	
+    private final Logger logger = LoggerFactory.getLogger(RootService.class);
+
 	@Transactional
 	public Root getRootByRootString(String rootString) {
-		return this.rootRepo.getRootByRootString(rootString);
+		Root root = null;
+		try {
+			root = this.rootRepo.getRootByRootString(rootString); 
+		} catch (NoResultException e) {
+			//TODO 
+		}
+		
+		return root;
 	}
 	
 	@Transactional(readOnly = false)
@@ -24,6 +36,7 @@ public class RootService {
 		Root root = this.getRootByRootString(rootString);
 		if (root == null) {
 			root = rootRepo.addRoot(rootString, meaning);
+			logger.debug(String.format("Added new root %s", rootString));
 		}
 		return root;
 	}

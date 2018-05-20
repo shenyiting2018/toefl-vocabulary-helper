@@ -4,6 +4,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.yiting.toeflvoc.models.Alias;
 
-public interface AliasRepository extends CrudRepository <Alias, Long> {
+public interface AliasRepositoryInterface extends CrudRepository <Alias, Long> {
 
 }

@@ -3,5 +3,6 @@ CREATE TABLE alias(
 	alias_string CHAR(255) NOT NULL,
 	UNIQUE KEY(alias_string),
 	PRIMARY KEY(id)
-) ENGINE INNODB;
+) ENGINE INNODB
+CHARACTER SET = utf8;
 

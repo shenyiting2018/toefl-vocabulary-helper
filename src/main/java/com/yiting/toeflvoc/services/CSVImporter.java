@@ -11,6 +11,8 @@ import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CSVImporter {
     private static final String GRE_CSV_FILE_PATH = "external_files/gre_root.csv";
+    private final Logger logger = LoggerFactory.getLogger(CSVImporter.class);
     
     private static final int ROOT_END_INDEX = 0;
     private static final int MEANING_END_INDEX = 1;
