@@ -18,7 +18,7 @@ public class Alias {
 	
 	@NotNull
 	@Size(max = 255)
-	@Column(name="alias_string")
+	@Column(name="alias_string", unique=true)
 	private String aliasString;
 
 	public Integer getId() {

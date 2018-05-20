@@ -1,5 +1,7 @@
 package com.yiting.toeflvoc.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -7,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.yiting.toeflvoc.beans.RootAliasMapBean;
+import com.yiting.toeflvoc.services.RootAliasMapService;
 import com.yiting.toeflvoc.services.RootService;
 import com.yiting.toeflvoc.utils.AjaxResponse;
 
@@ -16,6 +20,9 @@ public class RootController {
 
 	@Autowired
 	private RootService rootService;
+	
+	@Autowired
+	private RootAliasMapService rootAliasMapService;
 	
 	@RequestMapping(path="/", method=RequestMethod.POST)
 	public @ResponseBody AjaxResponse addRoot(@RequestParam String rootString) {
@@ -27,5 +34,14 @@ public class RootController {
 			response.putData("message", e.getMessage());
 			return response;
 		}
+	}
+	
+	@RequestMapping(path="/mapbeans", method=RequestMethod.GET)
+	public @ResponseBody AjaxResponse getAllRoots() {
+		List<RootAliasMapBean> beans = rootAliasMapService.getAllRootAliasMapBeans();
+		
+		AjaxResponse resp = AjaxResponse.successResponse();
+		resp.putData("data", beans);
+		return resp;
 	}
 }

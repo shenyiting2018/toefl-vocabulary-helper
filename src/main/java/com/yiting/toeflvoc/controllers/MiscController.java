@@ -19,11 +19,10 @@ public class MiscController {
 	@RequestMapping(path="/", method=RequestMethod.GET)
 	public AjaxResponse importGRECSV() {
 		try {
-			csvImporter.importGRERootCSV();
+			int count = csvImporter.importGRERootCSV();
+			return AjaxResponse.successResponseWithMsg(String.format("Imported successfully, %s entries processed", count));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return AjaxResponse.errorResponseWithMsg(e.getMessage());
 		}
-		return null;
 	}
 }

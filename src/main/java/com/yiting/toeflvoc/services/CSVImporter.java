@@ -18,6 +18,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
+import com.yiting.toeflvoc.models.Alias;
+import com.yiting.toeflvoc.models.Root;
+import com.yiting.toeflvoc.models.Word;
+import com.yiting.toeflvoc.utils.PropertyManager;
+
 @Service
 public class CSVImporter {
     private static final String GRE_CSV_FILE_PATH = "external_files/gre_root.csv";
@@ -33,21 +38,44 @@ public class CSVImporter {
     @Autowired
 	private RootService rootService;
     
-	public void importGRERootCSV() throws IOException {
-		final Resource fileResource = this.resourceLoader.getResource(GRE_CSV_FILE_PATH);
+    @Autowired
+    private AliasService aliasService;
+    
+    @Autowired
+    private RootAliasMapService rootAliasMapService;
+    
+    @Autowired
+    private WordService wordService;
+    
+    @Autowired
+    private WordRootMapService wordRootMapService;
+    
+    @Autowired
+    private PropertyManager propertyManager;
+    
+	public int importGRERootCSV() throws IOException {
+		logger.info("Start importing csv file");
+		String location = this.propertyManager.getCsvFilePath();
+		final Resource fileResource = this.resourceLoader.getResource(location);
 		File file = fileResource.getFile();
 		Reader in = new FileReader(file);
 		Iterable<CSVRecord> records = CSVFormat.DEFAULT.parse(in);
 		
+		int number = 0;
 		for (CSVRecord record : records) {
 			Iterator<String> columns = record.iterator();
 			int count = 0;
+			
 			String rootString = null;
 			List<String> meaning = new ArrayList<>();
+			List<String> aliasStrings = new ArrayList<>();
+			List<String> wordStrings = new ArrayList<>();
+			
 			while (columns.hasNext()) {
 				String element = columns.next();
 				if (count == ROOT_END_INDEX) {
 					rootString = element;
+					aliasStrings.add(element);
 				} else if (count == MEANING_END_INDEX) {
 					String[] meanings = element.split("\\|");
 					for (String m : meanings) {
@@ -55,15 +83,30 @@ public class CSVImporter {
 					}
 				} else if (count <= ALIAS_END_INDEX) {
 					if (StringUtils.isNotBlank(element)) {
-						
+						aliasStrings.add(element);
+					}
+				} else {
+					if (StringUtils.isNotBlank(element)) {
+						wordStrings.add(element);
 					}
 				}
 				count++;
 			}
 			
-
+			Root root = this.rootService.addRoot(rootString, meaning);
+			for (String aliasString : aliasStrings) {
+				Alias alias = aliasService.addAlias(aliasString);
+				this.rootAliasMapService.addRootAliasMap(root, alias, "");
+			}
 			
-			this.rootService.addRoot(rootString, meaning);
+			for (String wordString : wordStrings) {
+				Word word = wordService.addWord(wordString, new ArrayList<>());
+				this.wordRootMapService.addWordRootMap(word, root, "");
+			}
+			
+			number++;
 		}
+		logger.info(String.format("Importing CSV finished, %s records processes", number));
+		return number;
 	}
 }

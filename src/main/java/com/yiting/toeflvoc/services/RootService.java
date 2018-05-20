@@ -10,20 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yiting.toeflvoc.daos.RootRepository;
+import com.yiting.toeflvoc.daos.RootDAO;
 import com.yiting.toeflvoc.models.Root;
 
 @Service
 public class RootService {
 	@Autowired
-	private RootRepository rootRepo;
+	private RootDAO rootDAO;
     private final Logger logger = LoggerFactory.getLogger(RootService.class);
 
 	@Transactional
 	public Root getRootByRootString(String rootString) {
 		Root root = null;
 		try {
-			root = this.rootRepo.getRootByRootString(rootString); 
+			root = this.rootDAO.getRootByRootString(rootString); 
 		} catch (NoResultException e) {
 			//TODO 
 		}
@@ -35,7 +35,7 @@ public class RootService {
 	public Root addRoot(String rootString, List<String> meaning) {
 		Root root = this.getRootByRootString(rootString);
 		if (root == null) {
-			root = rootRepo.addRoot(rootString, meaning);
+			root = rootDAO.addRoot(rootString, meaning);
 			logger.debug(String.format("Added new root %s", rootString));
 		}
 		return root;
@@ -43,6 +43,6 @@ public class RootService {
 	
 	@Transactional(readOnly = false) 
 	public void save(Root root) {
-		this.rootRepo.save(root);
+		this.rootDAO.save(root);
 	}
 }

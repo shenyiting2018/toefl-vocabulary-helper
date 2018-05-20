@@ -1,6 +1,5 @@
 package com.yiting.toeflvoc.models;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -24,7 +23,7 @@ public class Root {
 	
 	@NotNull
 	@Size(max = 255)
-	@Column(name="root_string")
+	@Column(name="root_string", unique=true)
 	private String rootString;
 	
 	@NotNull

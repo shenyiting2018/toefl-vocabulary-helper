@@ -5,11 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.yiting</groupId>
-	<artifactId>toefl-voc</artifactId>
+	<artifactId>toefl</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>toefl-voc</name>
+	<name>toefl</name>
 	<description></description>
 
 	<parent>
@@ -22,7 +22,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>9</java.version>
+		<java.version>8</java.version>
 	</properties>
 
 	<dependencies>

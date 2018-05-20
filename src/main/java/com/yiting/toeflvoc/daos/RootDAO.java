@@ -12,7 +12,7 @@ import com.yiting.toeflvoc.models.Root;
 import com.yiting.toeflvoc.repos.RootRepositoryInterface;
 
 @Repository
-public class RootRepository {
+public class RootDAO {
 	@Autowired
 	private EntityManager entityManager;
 
@@ -23,8 +23,8 @@ public class RootRepository {
 	private static final String GET_ROOT_BY_ROOT_STRING = "from Root where rootString = :rootString";
 
 	public List<Root> getAllRoots() {
-		List<Root> courses = (List<Root>) rootRepo.findAll();
-		return courses;
+		List<Root> roots = (List<Root>) rootRepo.findAll();
+		return roots;
 	}
 
 	public Root getRootById(Integer id) {

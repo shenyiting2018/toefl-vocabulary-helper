@@ -17,10 +17,18 @@ public class AjaxResponse implements Serializable {
 	
 	private final HashMap<String, Object> data = new HashMap<String, Object>();
 	private String status;
+	private String msg;
 	
 	public static AjaxResponse successResponse() {
 		AjaxResponse response = new AjaxResponse();
 		response.status = AjaxResponse.SUCCESS;
+		return response;
+	}
+	
+	public static AjaxResponse successResponseWithMsg(String msg) {
+		AjaxResponse response = new AjaxResponse();
+		response.status = AjaxResponse.SUCCESS;
+		response.msg = msg;
 		return response;
 	}
 	
@@ -30,12 +38,27 @@ public class AjaxResponse implements Serializable {
 		return response;
 	}
 	
+	public static AjaxResponse errorResponseWithMsg(String msg) {
+		AjaxResponse response = new AjaxResponse();
+		response.status = AjaxResponse.ERROR;
+		response.msg = msg;
+		return response;
+	}
+	
 	public String getStatus() {
 		return status;
 	}
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getMsg() {
+		return msg;
+	}
+
+	public void setMsg(String msg) {
+		this.msg = msg;
 	}
 
 	public HashMap<String, Object> getData() {

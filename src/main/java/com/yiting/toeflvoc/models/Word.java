@@ -1,6 +1,9 @@
 package com.yiting.toeflvoc.models;
 
+import java.util.List;
+
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -8,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.yiting.toeflvoc.utils.StringListConverter;
 
 @Entity
 @Table(name="word")
@@ -18,13 +23,13 @@ public class Word {
 	
 	@NotNull
 	@Size(max = 255)
-	@Column(name="word_string")
+	@Column(name="word_string", unique=true)
 	private String wordString;
 	
 	@NotNull
-	@Size(max = 60000)
 	@Column(name="meaning")
-	private String meaning;
+	@Convert(converter = StringListConverter.class)
+	private List<String> meaning;
 
 	public Integer getId() {
 		return id;
@@ -42,11 +47,11 @@ public class Word {
 		this.wordString = wordString;
 	}
 
-	public String getMeaning() {
+	public List<String> getMeaning() {
 		return meaning;
 	}
 
-	public void setMeaning(String meaning) {
+	public void setMeaning(List<String> meaning) {
 		this.meaning = meaning;
 	}
 }
