@@ -1,5 +1,7 @@
 package com.yiting.toeflvoc.services;
 
+import java.util.List;
+
 import javax.persistence.NoResultException;
 
 import org.slf4j.Logger;
@@ -48,5 +50,10 @@ public class WordRootMapService {
 		
 		return wordRootMap;
 	}
+	
+	public List<WordRootMap> getRootWords(Integer rootId) {
+		return this.wordRootMapDao.getRootWords(rootId);
+	}
+	
 	
 }

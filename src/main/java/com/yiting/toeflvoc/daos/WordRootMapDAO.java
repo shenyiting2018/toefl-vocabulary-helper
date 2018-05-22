@@ -1,5 +1,7 @@
 package com.yiting.toeflvoc.daos;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
@@ -12,6 +14,7 @@ import com.yiting.toeflvoc.models.WordRootMap;
 import com.yiting.toeflvoc.repos.WordRootMapRepositoryInterface;
 
 @Repository
+@SuppressWarnings("unchecked")
 public class WordRootMapDAO {
 	@Autowired
 	private EntityManager entityManager;
@@ -21,8 +24,8 @@ public class WordRootMapDAO {
 
 	private static final String GET_WORD_ROOT_MAP_BY_WORD_STRING = "from WordRootMap where word.wordString = :wordString";	
 	private static final String GET_WORD_ROOT_MAP_BY_ROOT_STRING = "from WordRootMap where root.rootString = :rootString";
-	private static final String GET_WORD_ROOT_MAP_BY_WORD_ID = "from WordRootMap where word.id = :wordId";
-	private static final String GET_WORD_ROOT_MAP_BY_WORD_ID_AND_ROOT_ID = "from WordRootMap where word.id = :wordId and root.id = :rootId";
+	private static final String GET_WORD_ROOT_MAP_BY_ROOT_ID = "from WordRootMap where root.id = :rootId";
+	private static final String GET_WORD_ROOT_MAP_BY_WORD_ID_AND_ROOT_ID = "from WordRootMap where word.id = :wordId and root.id = :rootId order by word.wordString";
 	
 	public WordRootMap getWordRootMapByWordIdAndRoot(Integer wordId, Integer rootId) throws NoResultException {
 		return (WordRootMap) this.entityManager.createQuery(GET_WORD_ROOT_MAP_BY_WORD_ID_AND_ROOT_ID)
@@ -38,5 +41,11 @@ public class WordRootMapDAO {
 		
 		this.wordRootMapRepo.save(wordRootMap);
 		return wordRootMap;
+	}
+	
+	public List<WordRootMap> getRootWords(Integer rootId) {
+		return this.entityManager.createQuery(GET_WORD_ROOT_MAP_BY_ROOT_ID)
+				.setParameter("rootId", rootId)
+				.getResultList();
 	}
 }

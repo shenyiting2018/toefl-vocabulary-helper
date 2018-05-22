@@ -1,7 +1,9 @@
 (function() {
 	var rootAliasMapBeans = [];
 
-	$.get('/root/mapbeans', function(data, status) {
+
+
+	$.get('/toefl/root/mapbeans', function(data, status) {
 		if (status === 'success') {
 			if (data.status === 'success') {
 				rootAliasMapBeans = data.data.data;
@@ -21,9 +23,20 @@
 							'</div>'
 							].join('\n'),
 							suggestion: function(data) {
-								return '<div><strong>' + data.aliasString + '</strong> (' + data.rootString + ') : ' + data.rootMeaning + '</div>';
+								return "<div class='root_in_dropdown' value=" + data.rootId + "><strong>" + data.aliasString + "</strong> (" + data.rootString + ") : " + data.rootMeaning + "</div>";
 							}
 					}
+				});
+
+				$('.typeahead').bind('typeahead:select', function(event, suggestion) {
+					var param = {rootIdStr: suggestion.rootId};
+					$.get('/toefl/root/rootwords', param, function(data, status){
+						if (status === 'success') {
+							if (data.status === 'success') {
+								debugger
+							}
+						}
+					}); 
 				});
 			} else {
 				console.log('error');

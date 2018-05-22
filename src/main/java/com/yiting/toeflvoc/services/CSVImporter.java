@@ -94,6 +94,7 @@ public class CSVImporter {
 			}
 			
 			Root root = this.rootService.addRoot(rootString, meaning);
+			logger.debug(String.format("Imported root %s with meaning %s", root.getRootString(), root.getMeaning().toString()));
 			for (String aliasString : aliasStrings) {
 				Alias alias = aliasService.addAlias(aliasString);
 				this.rootAliasMapService.addRootAliasMap(root, alias, "");

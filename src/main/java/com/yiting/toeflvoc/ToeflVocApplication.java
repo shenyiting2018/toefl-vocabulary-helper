@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ToeflVocApplication {
 
 	public static void main(String[] args) {
+		
 		SpringApplication.run(ToeflVocApplication.class, args);
 	}
 }
