@@ -25,7 +25,6 @@ import com.yiting.toeflvoc.utils.PropertyManager;
 
 @Service
 public class CSVImporter {
-    private static final String GRE_CSV_FILE_PATH = "external_files/gre_root.csv";
     private final Logger logger = LoggerFactory.getLogger(CSVImporter.class);
     
     private static final int ROOT_END_INDEX = 0;
@@ -36,19 +35,7 @@ public class CSVImporter {
     private ResourceLoader resourceLoader;
     
     @Autowired
-	private RootService rootService;
-    
-    @Autowired
-    private AliasService aliasService;
-    
-    @Autowired
-    private RootAliasMapService rootAliasMapService;
-    
-    @Autowired
-    private WordService wordService;
-    
-    @Autowired
-    private WordRootMapService wordRootMapService;
+    private VocabularyService vocabularyService;
     
     @Autowired
     private PropertyManager propertyManager;
@@ -66,7 +53,7 @@ public class CSVImporter {
 			Iterator<String> columns = record.iterator();
 			int count = 0;
 			
-			String rootString = null;
+			String rootString = null; 
 			List<String> meaning = new ArrayList<>();
 			List<String> aliasStrings = new ArrayList<>();
 			List<String> wordStrings = new ArrayList<>();
@@ -77,7 +64,7 @@ public class CSVImporter {
 					rootString = element;
 					aliasStrings.add(element);
 				} else if (count == MEANING_END_INDEX) {
-					String[] meanings = element.split("\\|");
+					String[] meanings = element.split("\\;");
 					for (String m : meanings) {
 						meaning.add(m);
 					}
@@ -93,16 +80,16 @@ public class CSVImporter {
 				count++;
 			}
 			
-			Root root = this.rootService.addRoot(rootString, meaning);
+			Root root = this.vocabularyService.addRoot(rootString, meaning);
 			logger.debug(String.format("Imported root %s with meaning %s", root.getRootString(), root.getMeaning().toString()));
 			for (String aliasString : aliasStrings) {
-				Alias alias = aliasService.addAlias(aliasString);
-				this.rootAliasMapService.addRootAliasMap(root, alias, "");
+				Alias alias = vocabularyService.addAlias(aliasString);
+				this.vocabularyService.addRootAliasMap(root, alias, "");
 			}
 			
 			for (String wordString : wordStrings) {
-				Word word = wordService.addWord(wordString, new ArrayList<>());
-				this.wordRootMapService.addWordRootMap(word, root, "");
+				Word word = vocabularyService.addWord(wordString, new ArrayList<>());
+				this.vocabularyService.addWordRootMap(word, root, "");
 			}
 			
 			number++;
