@@ -1,0 +1,46 @@
+<div th:fragment="root-search">
+	<div class="x_panel">
+		<div class="x_title">
+			<h2>Search Roots!</h2>
+			<div
+				th:replace="fragments/panel-navbar-toolbox :: panel-navbar-toolbox"></div>
+			<div class="clearfix"></div>
+		</div>
+		<div class="x_content">
+			<br />
+			<div
+				class="col-md-12 col-sm-12 col-xs-12 form-group centered top_search">
+				<div class="Typeahead Typeahead--twitterUsers">
+					<div class="u-posRelative">
+						<input class="Typeahead-hint" type="text" tabindex="-1" readonly>
+						<input class="Typeahead-input" id="search-roots" type="text"
+							name="q" placeholder="Search Word Roots..."> <img
+							class="Typeahead-spinner" th:src="@{images/spinner.gif}">
+					</div>
+					<div class="Typeahead-menu"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script id="result-template" type="text/x-handlebars-template">
+      <div class="ProfileCard u-cf">
+        <div class="ProfileCard-details">
+          <div class="ProfileCard-realName">{{aliasString}}</div>
+          <div class="ProfileCard-screenName">@{{rootString}}</div>
+          <div class="ProfileCard-description">{{rootMeaning}}</div>
+        </div>
+
+        <div class="ProfileCard-stats">
+          <a href="http://www.google.com">Google</a>
+          <div class="ProfileCard-stat"><span class="ProfileCard-stat-label">Tweets:</span> {{statuses_count}}</div>
+          <div class="ProfileCard-stat"><span class="ProfileCard-stat-label">Following:</span> {{friends_count}}</div>
+          <div class="ProfileCard-stat"><span class="ProfileCard-stat-label">Followers:</span> {{followers_count}}</div>
+        </div>
+      </div>
+    </script>
+
+	<script id="empty-template" type="text/x-handlebars-template">
+      <div class="EmptyMessage"> Can't find what you what? Add a new root here!</div>
+    </script>
+</div>

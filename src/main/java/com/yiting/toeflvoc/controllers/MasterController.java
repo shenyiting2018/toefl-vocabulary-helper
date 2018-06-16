@@ -15,7 +15,7 @@ public class MasterController {
 		return "index";
 	}
 	
-	@RequestMapping(path="/form", method=RequestMethod.GET)
+	@RequestMapping(path="/search-and-analyze", method=RequestMethod.GET)
 	public String form(Model model) {
 		model.addAttribute("name", "Shiyao");
 		return "pages/search-and-analyze";

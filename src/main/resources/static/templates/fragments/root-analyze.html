@@ -1,0 +1,22 @@
+<div th:fragment="root-analyze">
+	<div class="x_panel">
+		<div class="x_title">
+			<h2>Analyze Roots! [Beta]</h2>
+			<div
+				th:replace="fragments/panel-navbar-toolbox :: panel-navbar-toolbox"></div>
+			<div class="clearfix"></div>
+		</div>
+		<div class="x_content">
+			<br />
+			<div
+				class="col-md-8 col-sm-8 col-xs-8 col-md-offset-2 col-sm-offset-2 col-xs-offset-2 form-group centered top_search">
+				<div id="root-search" class="input-group">
+					<input id="analyze-word" type="text" class="form-control" placeholder="Analyze words...">
+					<span class="input-group-btn">
+						<button id="analyze-button" class="btn btn-primary" type="button">Go!</button>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
