@@ -184,9 +184,9 @@ input[type=text]::-ms-clear {
 .Typeahead {
 	position: relative;
 	*z-index: 1;
-	width: 500px;
+	width: 400px;
 	margin: 0 auto 0 auto;
-	padding: 15px;
+	padding: 8px;
 	text-align: left;
 	background-color: #0097cf;
 	background-image: -moz-linear-gradient(top, #04a2dd, #03739c);
@@ -231,7 +231,27 @@ input[type=text]::-ms-clear {
 	border-radius: 8px;
 }
 
+.Typeahead-hint-2, .Typeahead-input {
+	width: 100%;
+	padding: 5px 8px;
+	font-size: 24px;
+	line-height: 30px;
+	border: 1px solid #024e6a;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+}
+
+
 .Typeahead-hint {
+	position: absolute;
+	top: 0;
+	left: 0;
+	color: #ccd6dd;
+	opacity: 1;
+}
+
+.Typeahead-hint-2 {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -266,7 +286,30 @@ input[type=text]::-ms-clear {
 	box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
 }
 
+.Typeahead-menu-2 {
+	position: absolute;
+	top: 95%;
+	left: 2.5%;
+	z-index: 100;
+	display: none;
+	width: 95%;
+	margin-bottom: 20px;
+	overflow: hidden;
+	background-color: #fff;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	box-shadow: 0px 0px 0px 1px green;
+	-webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+	-moz-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+	box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+}
+
 .Typeahead-menu.is-open {
+	display: block;
+}
+
+.Typeahead-menu-2.is-open {
 	display: block;
 }
 

@@ -35,7 +35,7 @@ public class CSVImporter {
     private ResourceLoader resourceLoader;
     
     @Autowired
-    private VocabularyService vocabularyService;
+    private VocabularyBeanService vocabularyService;
     
     @Autowired
     private PropertyManager propertyManager;

@@ -979,10 +979,10 @@ if (typeof NProgress != 'undefined') {
 			$/*.listen*/('parsley:field:validate', function() {
 			  validateFront();
 			});
-			$('#demo-form2 .btn').on('click', function() {
+/*			$('#demo-form2 .btn').on('click', function() {
 			  $('#demo-form2').parsley().validate();
 			  validateFront();
-			});
+			});*/
 			var validateFront = function() {
 			  if (true === $('#demo-form2').parsley().isValid()) {
 				$('.bs-callout-info').removeClass('hidden');
@@ -2490,8 +2490,8 @@ if (typeof NProgress != 'undefined') {
 				console.log('init_DataTables');
 				
 				var handleDataTableButtons = function() {
-				  if ($("#datatable-buttons").length) {
-					$("#datatable-buttons").DataTable({
+				  if ($("#root-words-table").length) {
+					$("#root-words-table").DataTable({
 					  dom: "Blfrtip",
 					  buttons: [
 						{

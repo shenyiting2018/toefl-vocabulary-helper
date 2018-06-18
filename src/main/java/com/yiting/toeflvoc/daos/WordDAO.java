@@ -19,7 +19,7 @@ public class WordDAO {
 	@Autowired
 	private WordRepositoryInterface wordRepo;
 
-	private static final String GET_WORD_BY_ID = "SELECT Word FROM Word WHERE id = :id";	
+	private static final String GET_WORD_BY_ID = "from Word where id = :id";	
 	private static final String GET_WORD_BY_WORD_STRING = "from Word where wordString = :wordString";
 
 	public List<Word> getAllWords() {
@@ -40,10 +40,10 @@ public class WordDAO {
 				.getSingleResult();
 	}
 	
-	public Word addWord(String wordString, List<String> meaning) {
+	public Word addWord(String wordString, List<String> meanings) {
 		Word word = new Word();
 		word.setWordString(wordString);
-		word.setMeaning(meaning);
+		word.setMeanings(meanings);
 		this.wordRepo.save(word);
 		return word;
 	}

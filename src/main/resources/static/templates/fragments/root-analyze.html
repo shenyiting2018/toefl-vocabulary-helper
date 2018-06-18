@@ -1,7 +1,7 @@
 <div th:fragment="root-analyze">
-	<div class="x_panel">
+	<div "root-analyze-panel" class="x_panel">
 		<div class="x_title">
-			<h2>Analyze Roots! [Beta]</h2>
+			<h2>Analyze a Word! [Beta]</h2>
 			<div
 				th:replace="fragments/panel-navbar-toolbox :: panel-navbar-toolbox"></div>
 			<div class="clearfix"></div>
@@ -9,14 +9,46 @@
 		<div class="x_content">
 			<br />
 			<div
-				class="col-md-8 col-sm-8 col-xs-8 col-md-offset-2 col-sm-offset-2 col-xs-offset-2 form-group centered top_search">
-				<div id="root-search" class="input-group">
-					<input id="analyze-word" type="text" class="form-control" placeholder="Analyze words...">
-					<span class="input-group-btn">
-						<button id="analyze-button" class="btn btn-primary" type="button">Go!</button>
-					</span>
+				class="col-md-12 col-sm-12 col-xs-12 form-group centered top_search">
+				<div id="root-analyze-typeahead" class="Typeahead Typeahead--twitterUsers">
+					<div class="u-posRelative">
+						<input class="Typeahead-hint-2" type="text" tabindex="-1" readonly>
+						<input class="Typeahead-input" id="analyze-roots" type="text"
+							name="q" placeholder="Analyze a word..."> <img
+							class="Typeahead-spinner" th:src="@{images/spinner.gif}">
+					</div>
+					<div class="Typeahead-menu-2"></div>
 				</div>
 			</div>
 		</div>
 	</div>
+
+	<script id="analyze-result-template" type="text/x-handlebars-template">
+		<div class="ProfileCard u-cf">
+			<div class="ProfileCard-details">
+				<div class="col-md-4">
+					<div class="ProfileCard-realName">{{word.wordString}}</div>
+				    <div class="ProfileCard-description">{{#each
+					  word.meanings}}{{this}}{{/each}}</div>
+				</div>
+				<div class="col-md-8">{{#wordRootsListHelper
+					wordRootMaps}}{{this}}{{/wordRootsListHelper}}</div>
+			</div>
+		</div>
+    </script>
+	<script id="analyze-empty-template" type="text/x-handlebars-template">
+      <div class="EmptyMessage rootSearchEmpty"> Can't find what you what? Click 'Enter' to analyze!</div>
+    </script>
+
 </div>
+
+
+<!-- <div
+	class="col-md-8 col-sm-8 col-xs-8 col-md-offset-2 col-sm-offset-2 col-xs-offset-2 form-group centered top_search">
+	<div id="root-search" class="input-group">
+		<input id="analyze-word" type="text" class="form-control"
+			placeholder="Analyze words..."> <span class="input-group-btn">
+			<button id="analyze-button" class="btn btn-primary" type="button">Go!</button>
+		</span>
+	</div>
+</div> -->

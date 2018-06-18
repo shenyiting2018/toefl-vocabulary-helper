@@ -3,28 +3,36 @@ package com.yiting.toeflvoc.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.yiting.toeflvoc.beans.RootAliasMapBean;
-import com.yiting.toeflvoc.models.WordRootMap;
-import com.yiting.toeflvoc.services.VocabularyService;
+import com.yiting.toeflvoc.beans.AnalyzeResultBean;
+import com.yiting.toeflvoc.beans.RootBean;
+import com.yiting.toeflvoc.beans.WordBean;
+import com.yiting.toeflvoc.models.RootAliasMap;
+import com.yiting.toeflvoc.services.VocabularyBeanService;
+import com.yiting.toeflvoc.services.VocabularyModelService;
 import com.yiting.toeflvoc.utils.AjaxResponse;
+import com.yiting.toeflvoc.utils.ResourceNotFoundException;
 
 @RestController
-@RequestMapping(path="/root")
+@RequestMapping(path="/vocabularies")
 public class VocabularyController {
 
 	@Autowired
-	private VocabularyService vocabularyService;
+	private VocabularyBeanService beanService;
 	
-	@RequestMapping(path="/", method=RequestMethod.POST)
+	@Autowired
+	private VocabularyModelService modelService;
+	
+	@RequestMapping(path="/root", method=RequestMethod.POST)
 	public @ResponseBody AjaxResponse addRoot(@RequestParam String rootString) {
 		try {
-			vocabularyService.addRoot(rootString, null);
+			modelService.addRoot(rootString, null);
 			return AjaxResponse.successResponse();
 		} catch (Exception e) {
 			AjaxResponse response = AjaxResponse.errorResponse();
@@ -33,18 +41,43 @@ public class VocabularyController {
 		}
 	}
 	
-	@RequestMapping(path="/mapbeans", method=RequestMethod.GET)
-	public @ResponseBody AjaxResponse getAllRoots() {
-		List<RootAliasMapBean> beans = vocabularyService.getAllRootAliasMapBeans();
+	@RequestMapping(path="/rootAliasMaps", method=RequestMethod.GET)
+	public @ResponseBody AjaxResponse getAllRootAliasMaps() {
+		List<RootAliasMap> beans = modelService.getAllRootAliasMaps();
 		
 		AjaxResponse resp = AjaxResponse.successResponse();
 		resp.putData("data", beans);
 		return resp;
 	}
 	
-	@RequestMapping(path="/rootwords", method=RequestMethod.GET)
-	public @ResponseBody AjaxResponse getAllWordsForRoot(@RequestParam String rootIdStr) {
-		List<WordRootMap> beans = vocabularyService.getRootWords(Integer.valueOf(rootIdStr));
+	@RequestMapping(path="/rootBeans", method=RequestMethod.GET)
+	public @ResponseBody AjaxResponse getAllRootBeans() {
+		List<RootBean> beans = beanService.getAllRootBeans();
+		
+		AjaxResponse resp = AjaxResponse.successResponse();
+		resp.putData("data", beans);
+		return resp;
+	}
+	
+	@RequestMapping(path="/rootBean/{rootIdStr}", method=RequestMethod.GET)
+	public @ResponseBody AjaxResponse getRoodBeanByRootId(@PathVariable String rootIdStr) {
+		RootBean bean;
+		try {
+			bean = beanService.getRootBean(Integer.valueOf(rootIdStr));
+		} catch (NumberFormatException | ResourceNotFoundException e) {
+			return AjaxResponse.errorResponseWithMsg(e.getMessage());
+
+		}
+		
+		AjaxResponse resp = AjaxResponse.successResponse();
+		resp.putData("data", bean);
+		return resp;
+	}
+	
+	
+	@RequestMapping(path="/wordBeans", method=RequestMethod.GET)
+	public @ResponseBody AjaxResponse getAllWordBeans() {
+		List<WordBean> beans = beanService.getAllWordBeans();
 		
 		AjaxResponse resp = AjaxResponse.successResponse();
 		resp.putData("data", beans);
@@ -53,10 +86,16 @@ public class VocabularyController {
 	
 	@RequestMapping(path="/analyze", method=RequestMethod.GET)
 	public @ResponseBody AjaxResponse analyzeRootForWord(@RequestParam String wordString) {
-		List<RootAliasMapBean> beans = vocabularyService.analyzeRootForWord(wordString);
+		List<AnalyzeResultBean> beans;
+		try {
+			beans = beanService.analyzeRootForWord(wordString);
+		} catch (NumberFormatException | ResourceNotFoundException e) {
+			return AjaxResponse.errorResponseWithMsg(e.getMessage());
+		}
 		
 		AjaxResponse resp = AjaxResponse.successResponse();
 		resp.putData("data", beans);
 		return resp;
 	}
+	
 }

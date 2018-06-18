@@ -1,63 +1,44 @@
 <div th:fragment="word-root-analysis-table">
 	<div class="x_panel">
 		<div class="x_title">
-			<h2>Analyze Results</h2>
-			<ul class="nav navbar-right panel_toolbox">
-				<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-				</li>
-				<li class="dropdown"><a href="#" class="dropdown-toggle"
-					data-toggle="dropdown" role="button" aria-expanded="false"><i
-						class="fa fa-wrench"></i></a>
-					<ul class="dropdown-menu" role="menu">
-						<li><a href="#">Settings 1</a></li>
-						<li><a href="#">Settings 2</a></li>
-					</ul></li>
-				<li><a class="close-link"><i class="fa fa-close"></i></a></li>
-			</ul>
+			<h2>Analyze Results for: <strong id="word-to-analyze"></strong></h2>
+			<div
+				th:replace="fragments/panel-navbar-toolbox :: panel-navbar-toolbox"></div>
+			<div class="clearfix"></div>
 			<div class="clearfix"></div>
 		</div>
 		<div class="x_content">
 			<div class="table-responsive">
-				<table id="analyze-table" class="table table-striped jambo_table bulk_action">
+				<table id="analyze-table" class="table table-striped jambo_table">
 					<thead>
 						<tr class="headings">
-							<th><input type="checkbox" id="check-all" class="flat">
-							</th>
 							<th class="column-title">Root Alias</th>
 							<th class="column-title">Root</th>
 							<th class="column-title">Meaning</th>
-							<th class="column-title no-link last"><span class="nobr">Action</span></th>
-							<th class="bulk-actions" colspan="7"><a class="antoo"
-								style="color: #fff; font-weight: 500;">Bulk Actions ( <span
-									class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
-							</th>
+							<th class="column-title">Description</th>
+							<th class="column-title">Verified</th>
 						</tr>
 					</thead>
-					<tbody>
-                         <tr class="even pointer">
-                            <td class="a-center ">
-                              <input type="checkbox" class="flat" name="table_records">
-                            </td>
-							<th scope="row">1</th>
-							<td>Mark</td>
-							<td>Otto</td>
-							<td>@mdo</td>
-						</tr>
-						<tr>
-							<th scope="row">2</th>
-							<td>Jacob</td>
-							<td>Thornton</td>
-							<td>@fat</td>
-						</tr>
-						<tr>
-							<th scope="row">3</th>
-							<td>Larry</td>
-							<td>the Bird</td>
-							<td>@twitter</td>
-						</tr>
+					<tbody id="analyze-table-data">
 					</tbody>
 				</table>
 			</div>
 		</div>
 	</div>
+
+	<script id="analyze-result-table-template"
+		type="text/x-handlebars-template">
+		<tr class="even pointer">
+			<td class=" ">{{aliasString}}</td>
+			<td class=" ">{{rootString}}</td>
+			<td class=" ">{{#collonAppender
+				rootMeanings}}{{this}}{{/collonAppender}}</td>
+			<td class=" ">{{description}}</td>
+			<td class=" ">{{#if verified}} <i class="fa fa-check fa-2x centered" style="color:#4ef442;"></i>
+				{{else}}<button class="btn btn-info">Verify!</button></td></i> {{/if}}
+			</td>
+		</tr>
+    </script>
 </div>
+
+

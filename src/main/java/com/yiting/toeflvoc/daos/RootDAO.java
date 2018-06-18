@@ -19,7 +19,7 @@ public class RootDAO {
 	@Autowired
 	private RootRepositoryInterface rootRepo;
 
-	private static final String GET_ROOT_BY_ID = "SELECT Root FROM Root WHERE id = :id";	
+	private static final String GET_ROOT_BY_ID = "from Root where id = :id";	
 	private static final String GET_ROOT_BY_ROOT_STRING = "from Root where rootString = :rootString";
 
 	public List<Root> getAllRoots() {
@@ -40,10 +40,10 @@ public class RootDAO {
 				.getSingleResult();
 	}
 	
-	public Root addRoot(String rootString, List<String> meaning) {
+	public Root addRoot(String rootString, List<String> meanings) {
 		Root root = new Root();
 		root.setRootString(rootString);
-		root.setMeaning(meaning);
+		root.setMeanings(meanings);
 		this.rootRepo.save(root);
 		return root;
 	}

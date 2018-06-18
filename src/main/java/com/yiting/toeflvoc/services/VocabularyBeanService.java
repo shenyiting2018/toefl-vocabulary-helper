@@ -1,10 +1,11 @@
 package com.yiting.toeflvoc.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.persistence.NoResultException;
+import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,206 +13,160 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yiting.toeflvoc.beans.RootAliasMapBean;
-import com.yiting.toeflvoc.daos.AliasDAO;
-import com.yiting.toeflvoc.daos.RootAliasMapDAO;
-import com.yiting.toeflvoc.daos.RootDAO;
-import com.yiting.toeflvoc.daos.WordDAO;
-import com.yiting.toeflvoc.daos.WordRootMapDAO;
-import com.yiting.toeflvoc.models.Alias;
-import com.yiting.toeflvoc.models.Root;
+import com.yiting.toeflvoc.beans.AliasBean;
+import com.yiting.toeflvoc.beans.AnalyzeResultBean;
+import com.yiting.toeflvoc.beans.RootBean;
+import com.yiting.toeflvoc.beans.WordBean;
 import com.yiting.toeflvoc.models.RootAliasMap;
 import com.yiting.toeflvoc.models.Word;
 import com.yiting.toeflvoc.models.WordRootMap;
+import com.yiting.toeflvoc.utils.ResourceNotFoundException;
 
 @Service
-public class VocabularyService {
-	@Autowired
-	private AliasDAO aliasDAO;
+public class VocabularyBeanService {
+
 
 	@Autowired
-	private RootDAO rootDAO;
+	private VocabularyModelService modelService;
 
-	@Autowired
-	private WordDAO wordDAO;
+	private final Logger logger = LoggerFactory.getLogger(VocabularyBeanService.class);
 
-	@Autowired
-	private RootAliasMapDAO rootAliasMapDao;
+	private Map<Integer, AliasBean> aliasBeansCache = new HashMap<>();
+	private Map<Integer, RootBean> rootBeansCache = new HashMap<>();
+	private Map<Integer, WordBean> wordBeansCache = new HashMap<>();
 
-	@Autowired
-	private WordRootMapDAO wordRootMapDao;
+	private Map<Integer, AliasBean> getAliasBeansCache() {
+		if (this.aliasBeansCache.isEmpty()) {
+			List<RootAliasMap> maps = this.modelService.getAllRootAliasMaps();
 
-	private List<RootAliasMapBean> aliasCache = new ArrayList<>();
-
-	private final Logger logger = LoggerFactory.getLogger(VocabularyService.class);
-
-	@Transactional
-	public Root getRootByRootString(String rootString) {
-		Root root = null;
-		try {
-			root = this.rootDAO.getRootByRootString(rootString); 
-		} catch (NoResultException e) {
-			logger.error(e.getLocalizedMessage());
+			for (RootAliasMap map : maps) {
+				this.aliasBeansCache.putIfAbsent(map.getAlias().getId(), new AliasBean(map.getAlias(), new ArrayList<>()));
+				this.aliasBeansCache.get(map.getAlias().getId()).getRootAliasMaps().add(map);
+			}
+			logger.info("aliasBeansCache reinited.");
 		}
 
-		return root;
+		return this.aliasBeansCache;
 	}
 
-	@Transactional(readOnly = false)
-	public Root addRoot(String rootString, List<String> meaning) {
-		Root root = this.getRootByRootString(rootString);
-		if (root == null) {
-			root = rootDAO.addRoot(rootString, meaning);
-			logger.debug(String.format("Added new root %s", rootString));
-		}
-		return root;
-	}
+	private Map<Integer, RootBean> getRootBeansCache() {
+		if (this.rootBeansCache.isEmpty()) {
+			List<WordRootMap> wordRootMaps = this.modelService.getAllWordRootMaps();
+			List<RootAliasMap> rootAliasMaps = this.modelService.getAllRootAliasMaps();
 
-	@Transactional(readOnly = false) 
-	public void saveRoot(Root root) {
-		this.rootDAO.save(root);
-	}
+			for (WordRootMap map : wordRootMaps) {
+				this.rootBeansCache.putIfAbsent(map.getRoot().getId(), new RootBean(map.getRoot(), new ArrayList<>(), new ArrayList<>()));
+				this.rootBeansCache.get(map.getRoot().getId()).getWordRootMaps().add(map);
+			}
 
-	@Transactional
-	public Alias getAliasByAliasString(String aliasString) {
-		Alias alias = null;
-		try {
-			alias = this.aliasDAO.getAliasByAliasString(aliasString); 
-		} catch (NoResultException e) {
-			//TODO 
+			for (RootAliasMap map : rootAliasMaps) {
+				this.rootBeansCache.putIfAbsent(map.getRoot().getId(), new RootBean(map.getRoot(), new ArrayList<>(), new ArrayList<>()));
+				this.rootBeansCache.get(map.getRoot().getId()).getRootAliasMaps().add(map);
+			}
+			logger.info("rootBeansCache reinited.");
 		}
 
-		return alias;
+		return this.rootBeansCache;
 	}
 
-	@Transactional(readOnly = false)
-	public Alias addAlias(String aliasString) {
-		Alias alias = this.getAliasByAliasString(aliasString);
-		if (alias == null) {
-			alias = aliasDAO.addAlias(aliasString);
-			logger.debug(String.format("Added new alias %s", aliasString));
-		}
-		return alias;
-	}
+	private Map<Integer, WordBean> getWordBeansCache() {
+		if (this.wordBeansCache.isEmpty()) {
+			List<WordRootMap> maps = this.modelService.getAllWordRootMaps();
 
-	@Transactional(readOnly = false) 
-	public void saveAlias(Alias alias) {
-		this.aliasDAO.save(alias);
-	}
-
-	@Transactional
-	public List<RootAliasMapBean> analyzeRootForWord(final String wordString) {
-		return this.getAllRootAliasMapBeans()
-				.stream()
-				.filter(a -> {
-					return wordString.contains(a.getAliasString());
-				})
-				.collect(Collectors.toList());
-	}
-
-	public boolean match(String word, String aliasString) {
-		return word.contains(aliasString);
-	}
-
-	public List<RootAliasMapBean> getAllRootAliasMapBeans() {
-		if (this.aliasCache.isEmpty()) {
-			List<RootAliasMap> models = this.getAllRootAliasMaps();
-			this.aliasCache = 
-					models.stream()
-					.map( m -> 
-					new RootAliasMapBean(
-							m.getAlias().getId(), 
-							m.getRoot().getId(),
-							m.getAlias().getAliasString(),
-							m.getRoot().getRootString(),
-							m.getRoot().getMeaning(),
-							m.getDescription())
-							)
-					.collect(Collectors.toList());
+			for (WordRootMap map : maps) {
+				this.wordBeansCache.putIfAbsent(map.getWord().getId(), new WordBean(map.getWord(), new ArrayList<>()));
+				this.wordBeansCache.get(map.getWord().getId()).getWordRootMaps().add(map);
+			}
+			logger.info("wordBeansCache reinited.");
 		}
 
-		return this.aliasCache;
+		return this.wordBeansCache;
+	}
+
+	public List<AliasBean> getAllAliasBeans() {
+		return new ArrayList<>(this.getAliasBeansCache().values());
+	}
+
+	public List<RootBean> getAllRootBeans() {
+		return new ArrayList<>(this.getRootBeansCache().values());
+	}
+	
+	public RootBean getRootBean(Integer rootId) throws ResourceNotFoundException {
+		RootBean rootBean = this.getRootBeansCache().get(rootId);
+
+		if (rootBean == null) {
+			String msg = String.format("Cache invalidated for some reason, received rootID: %s, but not in rootBeansCache, reinitiating rootBeansCache", rootId);
+			logger.error(msg);
+			throw new ResourceNotFoundException(msg);
+		}
+
+		return rootBean;
+	}
+
+	public List<WordBean> getAllWordBeans() {
+		return new ArrayList<>(this.getWordBeansCache().values());
+	}
+
+	public WordBean getWordBean(Integer wordId) throws ResourceNotFoundException {
+		WordBean wordBean = this.getWordBeansCache().get(wordId);
+
+		if (wordBean == null) {
+			String msg = String.format("Cache invalidated for some reason, received wordID: %s, but not in wordBeansCache, reinitiating wordcache", wordId);
+			logger.error(msg);
+			throw new ResourceNotFoundException(msg);
+		}
+
+		return wordBean;
 	}
 
 	@Transactional
-	public List<RootAliasMap> getAllRootAliasMaps() {
-		return this.rootAliasMapDao.getAllRootAliasMaps();
-	}
+	public List<AnalyzeResultBean> analyzeRootForWord(final String wordString) throws ResourceNotFoundException {
+		Set<Integer> rootIdSet = new HashSet<>();
+		List<AnalyzeResultBean> res = new ArrayList<>();
+		Word word = this.modelService.getWordByWordString(wordString);
+		
+		if (word != null) {
+			//If word already in DB, retrieve its current validated roots first.
+			WordBean bean = this.getWordBean(word.getId());
 
-	@Transactional
-	public RootAliasMap getRootAliasMap(Integer rootId, Integer aliasId) {
-		RootAliasMap rootAliasMap = null;
-		try {
-			rootAliasMap = this.rootAliasMapDao.getRootAliasMapByRootIdAndAlias(rootId, aliasId);
-		} catch (NoResultException e) {
-
+			for (WordRootMap map : bean.getWordRootMaps()) {
+				rootIdSet.add(map.getRoot().getId());
+				res.add(new AnalyzeResultBean(
+						map.getRoot().getId(),
+						map.getRoot().getRootString(),
+						map.getRoot().getRootString(),
+						map.getRoot().getMeanings(),
+						map.getDescription(),
+						true)
+						);
+			}
 		}
 
-		return rootAliasMap;
-	}
+		List<AnalyzeResultBean> analysis = new ArrayList<>();
 
-	@Transactional(readOnly = false)
-	public RootAliasMap addRootAliasMap(Root root, Alias alias, String description) {
-		RootAliasMap rootAliasMap = this.getRootAliasMap(root.getId(), alias.getId());
-		if (rootAliasMap == null) {
-			rootAliasMap = this.rootAliasMapDao.addRoot(root, alias, description);
-			logger.debug(String.format("Added new RootAliasMap %s, %s", root.getRootString(), alias.getAliasString()));
+		for (AliasBean bean : this.getAllAliasBeans()) {
+			for (RootAliasMap map : bean.getRootAliasMaps()) {
+				if (!rootIdSet.contains(map.getRoot().getId()) && this.match(wordString, map.getAlias().getAliasString())) {
+					analysis.add(new AnalyzeResultBean(
+							map.getRoot().getId(),
+							map.getAlias().getAliasString(),
+							map.getRoot().getRootString(),
+							map.getRoot().getMeanings(),
+							"",
+							false)
+							);
+				}
+			}
 		}
-
-		return rootAliasMap;
+		
+		analysis.sort((a, b) -> {
+			return a.getRootString().compareTo(b.getRootString());
+		}); 
+		res.addAll(analysis);
+		return res;
 	}
 
-	@Transactional
-	public Word getWordByWordString(String wordString) {
-		Word word = null;
-		try {
-			word = this.wordDAO.getWordByWordString(wordString); 
-		} catch (NoResultException e) {
-			//TODO 
-		}
-
-		return word;
-	}
-
-	@Transactional(readOnly = false)
-	public Word addWord(String wordString, List<String> meaning) {
-		Word word = this.getWordByWordString(wordString);
-		if (word == null) {
-			word = wordDAO.addWord(wordString, meaning);
-			logger.debug(String.format("Added new word %s", wordString));
-		}
-		return word;
-	}
-
-	@Transactional(readOnly = false) 
-	public void saveWord(Word word) {
-		this.wordDAO.save(word);
-	}
-
-	@Transactional
-	public WordRootMap getWordRootMap(Integer wordId, Integer rootId) {
-		WordRootMap wordRootMap = null;
-		try {
-			wordRootMap = this.wordRootMapDao.getWordRootMapByWordIdAndRoot(wordId, rootId);
-		} catch (NoResultException e) {
-
-		}
-
-		return wordRootMap;
-	}
-
-	@Transactional(readOnly = false)
-	public WordRootMap addWordRootMap(Word word, Root root, String description) {
-		WordRootMap wordRootMap = this.getWordRootMap(word.getId(), root.getId());
-		if (wordRootMap == null) {
-			wordRootMap = this.wordRootMapDao.addWord(word, root, description);
-			logger.debug(String.format("Added new WordRootMap %s, %s", word.getWordString(), root.getRootString()));
-		}
-
-		return wordRootMap;
-	}
-
-	public List<WordRootMap> getRootWords(Integer rootId) {
-		return this.wordRootMapDao.getRootWords(rootId);
+	private boolean match(String a, String b) {
+		return a.contains(b);
 	}
 }
