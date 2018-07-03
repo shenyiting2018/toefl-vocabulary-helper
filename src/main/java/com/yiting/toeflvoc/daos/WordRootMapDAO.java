@@ -36,11 +36,11 @@ public class WordRootMapDAO {
 				.getSingleResult();
 	}
 	
-	public WordRootMap addWord(Word word, Root root, String description) {
+	public WordRootMap addWordRootMap(Word word, Root root, String description) {
 		WordRootMap wordRootMap = new WordRootMap();
 		wordRootMap.setWord(word);
 		wordRootMap.setRoot(root);
-		
+		wordRootMap.setDescription(description);
 		this.wordRootMapRepo.save(wordRootMap);
 		return wordRootMap;
 	}

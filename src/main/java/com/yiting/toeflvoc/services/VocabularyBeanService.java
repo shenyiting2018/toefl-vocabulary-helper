@@ -19,6 +19,7 @@ import com.yiting.toeflvoc.beans.RootBean;
 import com.yiting.toeflvoc.beans.WordBean;
 import com.yiting.toeflvoc.models.RootAliasMap;
 import com.yiting.toeflvoc.models.Word;
+import com.yiting.toeflvoc.models.WordCategoryMap;
 import com.yiting.toeflvoc.models.WordRootMap;
 import com.yiting.toeflvoc.utils.ResourceNotFoundException;
 
@@ -68,15 +69,26 @@ public class VocabularyBeanService {
 
 		return this.rootBeansCache;
 	}
+	
+	public void invalideCache() {
+		this.aliasBeansCache.clear();
+		this.rootBeansCache.clear();
+		this.wordBeansCache.clear();
+		
+		logger.info("All cache cleared");
+	}
 
 	private Map<Integer, WordBean> getWordBeansCache() {
 		if (this.wordBeansCache.isEmpty()) {
-			List<WordRootMap> maps = this.modelService.getAllWordRootMaps();
-
-			for (WordRootMap map : maps) {
-				this.wordBeansCache.putIfAbsent(map.getWord().getId(), new WordBean(map.getWord(), new ArrayList<>()));
-				this.wordBeansCache.get(map.getWord().getId()).getWordRootMaps().add(map);
+			List<Word> allWords = this.modelService.getAllWords();
+			
+			for (Word word : allWords) {
+				List<WordRootMap> wordRootMaps = this.modelService.getWordRootMapsByWord(word.getId());
+				List<WordCategoryMap> wordCategoryMap = this.modelService.getWordCategoryMapByWord(word.getId());
+				
+				this.wordBeansCache.putIfAbsent(word.getId(), new WordBean(word, wordRootMaps, wordCategoryMap));
 			}
+			
 			logger.info("wordBeansCache reinited.");
 		}
 
@@ -96,7 +108,7 @@ public class VocabularyBeanService {
 
 		if (rootBean == null) {
 			String msg = String.format("Cache invalidated for some reason, received rootID: %s, but not in rootBeansCache, reinitiating rootBeansCache", rootId);
-			logger.error(msg);
+			logger.info(msg);
 			throw new ResourceNotFoundException(msg);
 		}
 

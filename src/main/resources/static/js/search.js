@@ -231,37 +231,6 @@ var rootWordsMapCache = new Map();
 		});	
 	}
 
-	var getWordBeans = function() {
-		$.get('/toefl/vocabularies/wordBeans', function(data, status) {
-			if (status === 'success') {
-				if (data.status === 'success') {
-					wordBeans = data.data.data;
-
-					analyzeRootsTypeahead(wordBeans);
-				} else {
-					console.log('error');
-				}
-			} else {
-				console.log('error');
-			}	
-		});	
-	}
-
-	var getRootBean = function(rootId, handler) {
-		$.get('/toefl/vocabularies/rootBean/' + rootId, function(data, status) {
-			if (status === 'success') {
-				if (data.status === 'success') {
-					rootBean = data.data.data;
-					handler(rootBean);
-				} else {
-					console.log('error');
-				}
-			} else {
-				console.log('error');
-			}	
-		});
-	}
-
 	var analyzeWord = function(wordString) {
 		param = {
 				wordString: wordString
@@ -278,7 +247,6 @@ var rootWordsMapCache = new Map();
 						appendTableRecord('analyze-table-data', recordHTML);
 					}
 
-					bulkUpdateActionEventRegister();
 				}
 			}
 		});
@@ -327,8 +295,6 @@ var rootWordsMapCache = new Map();
 	
 	registerHandlebars();
 	getRootAliasMaps();
-	getWordBeans();
-
-
+	getWordBeans(analyzeRootsTypeahead);
 })();
 

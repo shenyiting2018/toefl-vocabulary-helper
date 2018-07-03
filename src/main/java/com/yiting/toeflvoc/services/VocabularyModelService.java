@@ -12,20 +12,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yiting.toeflvoc.daos.AliasDAO;
+import com.yiting.toeflvoc.daos.CategoryDAO;
 import com.yiting.toeflvoc.daos.RootAliasMapDAO;
 import com.yiting.toeflvoc.daos.RootDAO;
+import com.yiting.toeflvoc.daos.WordCategoryMapDAO;
 import com.yiting.toeflvoc.daos.WordDAO;
 import com.yiting.toeflvoc.daos.WordRootMapDAO;
 import com.yiting.toeflvoc.models.Alias;
+import com.yiting.toeflvoc.models.Category;
 import com.yiting.toeflvoc.models.Root;
 import com.yiting.toeflvoc.models.RootAliasMap;
 import com.yiting.toeflvoc.models.Word;
+import com.yiting.toeflvoc.models.WordCategoryMap;
 import com.yiting.toeflvoc.models.WordRootMap;
 import com.yiting.toeflvoc.utils.ResourceDuplicatedException;
 import com.yiting.toeflvoc.utils.ResourceNotFoundException;
 
 @Service
 public class VocabularyModelService {
+	@Autowired
+	private VocabularyBeanService beanService;
+	
 	@Autowired
 	private AliasDAO aliasDAO;
 
@@ -41,6 +48,12 @@ public class VocabularyModelService {
 	@Autowired
 	private WordRootMapDAO wordRootMapDao;
 	
+	@Autowired
+	private CategoryDAO categoryDAO;
+	
+	@Autowired
+	private WordCategoryMapDAO wordCategoryMapDAO;
+	
 	private final Logger logger = LoggerFactory.getLogger(VocabularyModelService.class);
 	
 	@Transactional(readOnly = false)
@@ -48,23 +61,22 @@ public class VocabularyModelService {
 		Alias alias = this.getAliasByAliasString(aliasString);
 		if (alias == null) {
 			alias = aliasDAO.addAlias(aliasString);
-			logger.info(String.format("Added new alias %s", aliasString));
-			return alias;
-		} else {
-			throw ResourceDuplicatedException.error(Alias.class, alias.getId());
+		//	logger.info(String.format("Added new alias %s", aliasString));
+			this.beanService.invalideCache();
 		}
+		
+		return alias;
 	}
 
 	@Transactional(readOnly = false)
-	public Root addRoot(String rootString, List<String> meanings) throws ResourceDuplicatedException, ResourceNotFoundException {
+	public Root addRoot(String rootString, List<String> meanings) {
 		Root root = this.getRootByRootString(rootString);
 		if (root == null) {
 			root = rootDAO.addRoot(rootString, meanings);
-			logger.debug(String.format("Added new root %s", rootString));
-			return root;
-		} else {
-			throw ResourceDuplicatedException.error(Root.class, root.getId());
+		//	logger.debug(String.format("Added new root %s", rootString));
 		}
+		
+		return root;
 	}
 	
 	@Transactional(readOnly = false)
@@ -82,13 +94,15 @@ public class VocabularyModelService {
 	}
 	
 	@Transactional(readOnly = false)
-	public Word addWord(String wordString, List<String> meanings) throws ResourceDuplicatedException, ResourceNotFoundException {
+	public Word addWord(String wordString, List<String> meanings, int count) {
 		Word word = this.getWordByWordString(wordString);
 		if (word == null) {
-			word = wordDAO.addWord(wordString, meanings);
+			word = wordDAO.addWord(wordString, meanings, count);
 			return word;
+		} else if (word.getMeanings().isEmpty()){
+			return this.replaceWordMeanings(word, meanings, count);
 		} else {
-			throw ResourceDuplicatedException.error(Word.class, word.getId());
+			return word;
 		}
 	}
 	
@@ -102,32 +116,51 @@ public class VocabularyModelService {
 		}
 		
 		meanings.add(meaning);
-		this.wordDAO.save(word);
+		this.wordDAO.save(word, 0);
 		return word;
 	}
 	
 	@Transactional(readOnly = false)
-	public WordRootMap addWordRootMap(Word word, Root root, String description) throws ResourceDuplicatedException {
-		WordRootMap wordRootMap = this.getWordRootMap(word.getId(), root.getId());
-		if (wordRootMap == null) {
-			wordRootMap = this.wordRootMapDao.addWord(word, root, description);
-			logger.debug(String.format("Added new WordRootMap %s, %s", word.getWordString(), root.getRootString()));
-			return wordRootMap;
-		} else {
-			throw ResourceDuplicatedException.error(WordRootMap.class, wordRootMap.getId());
+	public WordCategoryMap addWordCategoryMap(Word word, Category category) {
+		WordCategoryMap map = this.getWordCategoryMapByWordIdAndCategory(word.getId(), category.getId());
+		
+		if (map == null) {
+			map = new WordCategoryMap(category, word);
+			this.wordCategoryMapDAO.addWordCategoryMap(map);
 		}
+		
+		return map;
 	}
 	
 	@Transactional(readOnly = false)
-	public RootAliasMap addRootAliasMap(Root root, Alias alias, String description) throws ResourceDuplicatedException, ResourceNotFoundException {
+	public Word replaceWordMeanings(Word word, List<String> meanings, int count) {
+		word.setMeanings(meanings);
+		this.wordDAO.save(word, count);
+		return word;
+	}
+	
+	@Transactional(readOnly = false)
+	public WordRootMap addWordRootMap(Word word, Root root, String description) {
+		WordRootMap wordRootMap = this.getWordRootMap(word.getId(), root.getId());
+		if (wordRootMap == null) {
+			wordRootMap = this.wordRootMapDao.addWordRootMap(word, root, description);
+			//logger.debug(String.format("Added new WordRootMap %s, %s", word.getWordString(), root.getRootString()));
+			this.beanService.invalideCache();
+		}
+		
+		return wordRootMap;
+	}
+	
+	@Transactional(readOnly = false)
+	public RootAliasMap addRootAliasMap(Root root, Alias alias, String description) {
 		RootAliasMap rootAliasMap = this.getRootAliasMap(root.getId(), alias.getId());
 		if (rootAliasMap == null) {
 			rootAliasMap = this.rootAliasMapDao.addRoot(root, alias, description);
-			logger.debug(String.format("Added new RootAliasMap %s, %s", root.getRootString(), alias.getAliasString()));
-			return rootAliasMap;
-		} else {
-			throw ResourceDuplicatedException.error(RootAliasMap.class, rootAliasMap.getId());
-		}
+			//logger.debug(String.format("Added new RootAliasMap %s, %s", root.getRootString(), alias.getAliasString()));
+			this.beanService.invalideCache();
+		} 
+		
+		return rootAliasMap;
 	}
 	
 	@Transactional 
@@ -143,12 +176,11 @@ public class VocabularyModelService {
 	}
 	
 	@Transactional
-	public Alias getAliasByAliasString(String aliasString) throws ResourceNotFoundException {
+	public Alias getAliasByAliasString(String aliasString) {
 		Alias alias = null;
 		try {
 			alias = this.aliasDAO.getAliasByAliasString(aliasString); 
 		} catch (NoResultException e) {
-			throw new ResourceNotFoundException(e.getMessage());
 		}
 
 		return alias;
@@ -170,12 +202,12 @@ public class VocabularyModelService {
 	}
 	
 	@Transactional
-	public Root getRootByRootString(String rootString) throws ResourceNotFoundException {
+	public Root getRootByRootString(String rootString) {
 		Root root = null;
 		try {
 			root = this.rootDAO.getRootByRootString(rootString); 
 		} catch (NoResultException e) {
-			throw new ResourceNotFoundException(e.getMessage());
+			
 		}
 
 		return root;
@@ -198,15 +230,43 @@ public class VocabularyModelService {
 	}
 	
 	@Transactional
-	public Word getWordByWordString(String wordString) throws ResourceNotFoundException {
+	public Word getWordByWordString(String wordString) {
 		Word word = null;
+		// long time1 = System.currentTimeMillis();
 		try {
 			word = this.wordDAO.getWordByWordString(wordString); 
+		//	long time2 = System.currentTimeMillis();
+		//	System.out.println("dao use milli: " + (time2 - time1));
 		} catch (NoResultException e) {
-			throw new ResourceNotFoundException(e.getMessage());
 		}
 
+	//	long time3 = System.currentTimeMillis();
+	//	System.out.println("entire: " + (time3 - time1));
 		return word;
+	}
+	
+	@Transactional
+	public WordCategoryMap getWordCategoryMapByWordIdAndCategory(Integer wordId, Integer categoryId) {
+		WordCategoryMap map = null;
+		try {
+			map = this.wordCategoryMapDAO.getWordCategoryMapByWordIdAndCategory(wordId, categoryId);
+		} catch (NoResultException e) {
+		
+		}
+		
+		return map;
+	}
+	
+	@Transactional
+	public Category getCategoryByCategoryName(String categoryName) throws ResourceNotFoundException {
+		Category category = null;
+		try {
+			category = this.categoryDAO.getCategoryByCategoryString(categoryName);
+		} catch (NoResultException e) {
+		
+		}
+		
+		return category;
 	}
 	
 	public List<Word> getAllWords() {
@@ -219,12 +279,11 @@ public class VocabularyModelService {
 	}
 
 	@Transactional
-	public RootAliasMap getRootAliasMap(Integer rootId, Integer aliasId) throws ResourceNotFoundException {
+	public RootAliasMap getRootAliasMap(Integer rootId, Integer aliasId) {
 		RootAliasMap rootAliasMap = null;
 		try {
 			rootAliasMap = this.rootAliasMapDao.getRootAliasMapByRootIdAndAlias(rootId, aliasId);
 		} catch (NoResultException e) {
-			throw new ResourceNotFoundException(e.getMessage());
 		}
 
 		return rootAliasMap;
@@ -242,10 +301,12 @@ public class VocabularyModelService {
 		return wordRootMap;
 	}
 	
+	@Transactional
 	public List<WordRootMap> getWordRootMapsByRoot(Integer rootId) {
 		return this.wordRootMapDao.getWordRootMapByRoot(rootId);
 	}
 
+	@Transactional
 	public List<WordRootMap> getWordRootMapsByWord(Integer wordId) {
 		return this.wordRootMapDao.getWordRootMapByWord(wordId);
 	}
@@ -254,5 +315,13 @@ public class VocabularyModelService {
 	public List<WordRootMap> getAllWordRootMaps() {
 		return this.wordRootMapDao.getAllWordRootMaps();
 	}
+	
+	public List<WordCategoryMap> getWordCategoryMapByCategory(Integer categoryId) {
+		return this.wordCategoryMapDAO.getWordCategoryMapByCategory(categoryId);
+	}
 
+	@Transactional
+	public List<WordCategoryMap> getWordCategoryMapByWord(Integer wordId) {
+		return this.wordCategoryMapDAO.getWordCategoryMapByWord(wordId);
+	}
 }

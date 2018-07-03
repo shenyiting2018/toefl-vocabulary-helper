@@ -40,15 +40,19 @@ public class WordDAO {
 				.getSingleResult();
 	}
 	
-	public Word addWord(String wordString, List<String> meanings) {
+	public Word addWord(String wordString, List<String> meanings, int count) {
 		Word word = new Word();
 		word.setWordString(wordString);
 		word.setMeanings(meanings);
-		this.wordRepo.save(word);
+		this.save(word, count);
 		return word;
 	}
 	
-	public void save(Word word) {
-		this.wordRepo.save(word);
+	public void save(Word word, int count) {
+		if (count % 25 == 0) {
+			this.wordRepo.saveAndFlush(word);
+		} else {
+			this.wordRepo.save(word);
+		}
 	}
 }

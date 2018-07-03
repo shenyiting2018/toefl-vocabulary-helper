@@ -22,10 +22,12 @@ import com.yiting.toeflvoc.models.Alias;
 import com.yiting.toeflvoc.models.Root;
 import com.yiting.toeflvoc.models.Word;
 import com.yiting.toeflvoc.utils.PropertyManager;
+import com.yiting.toeflvoc.utils.ResourceDuplicatedException;
+import com.yiting.toeflvoc.utils.ResourceNotFoundException;
 
 @Service
-public class CSVImporter {
-    private final Logger logger = LoggerFactory.getLogger(CSVImporter.class);
+public class RootCSVImporter {
+    private final Logger logger = LoggerFactory.getLogger(RootCSVImporter.class);
     
     private static final int ROOT_END_INDEX = 0;
     private static final int MEANING_END_INDEX = 1;
@@ -35,13 +37,14 @@ public class CSVImporter {
     private ResourceLoader resourceLoader;
     
     @Autowired
-    private VocabularyBeanService vocabularyService;
+    private VocabularyModelService vocabularyService;
     
     @Autowired
     private PropertyManager propertyManager;
     
-	public int importGRERootCSV() throws IOException {
+	public int importGRERootCSV() throws IOException, ResourceDuplicatedException, ResourceNotFoundException {
 		logger.info("Start importing csv file");
+		
 		String location = this.propertyManager.getCsvFilePath();
 		final Resource fileResource = this.resourceLoader.getResource(location);
 		File file = fileResource.getFile();
@@ -64,7 +67,7 @@ public class CSVImporter {
 					rootString = element;
 					aliasStrings.add(element);
 				} else if (count == MEANING_END_INDEX) {
-					String[] meanings = element.split("\\;");
+					String[] meanings = element.split("\\|");
 					for (String m : meanings) {
 						meaning.add(m);
 					}
@@ -81,14 +84,14 @@ public class CSVImporter {
 			}
 			
 			Root root = this.vocabularyService.addRoot(rootString, meaning);
-			logger.debug(String.format("Imported root %s with meaning %s", root.getRootString(), root.getMeaning().toString()));
+			logger.debug(String.format("Imported root %s with meaning %s", root.getRootString(), root.getMeanings().toString()));
 			for (String aliasString : aliasStrings) {
-				Alias alias = vocabularyService.addAlias(aliasString);
+				Alias alias = this.vocabularyService.addAlias(aliasString);
 				this.vocabularyService.addRootAliasMap(root, alias, "");
 			}
 			
 			for (String wordString : wordStrings) {
-				Word word = vocabularyService.addWord(wordString, new ArrayList<>());
+				Word word = vocabularyService.addWord(wordString, new ArrayList<>(), number);
 				this.vocabularyService.addWordRootMap(word, root, "");
 			}
 			

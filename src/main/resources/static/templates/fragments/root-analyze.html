@@ -26,12 +26,12 @@
 	<script id="analyze-result-template" type="text/x-handlebars-template">
 		<div class="ProfileCard u-cf">
 			<div class="ProfileCard-details">
-				<div class="col-md-4">
+				<div class="col-md-6">
 					<div class="ProfileCard-realName">{{word.wordString}}</div>
 				    <div class="ProfileCard-description">{{#each
 					  word.meanings}}{{this}}{{/each}}</div>
 				</div>
-				<div class="col-md-8">{{#wordRootsListHelper
+				<div class="col-md-6">{{#wordRootsListHelper
 					wordRootMaps}}{{this}}{{/wordRootsListHelper}}</div>
 			</div>
 		</div>

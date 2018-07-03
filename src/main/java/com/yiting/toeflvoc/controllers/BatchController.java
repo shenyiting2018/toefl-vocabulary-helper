@@ -3,23 +3,40 @@ package com.yiting.toeflvoc.controllers;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.yiting.toeflvoc.services.CSVImporter;
+import com.yiting.toeflvoc.services.RootCSVImporter;
+import com.yiting.toeflvoc.services.StandardWordCSVImporter;
 import com.yiting.toeflvoc.utils.AjaxResponse;
+import com.yiting.toeflvoc.utils.ResourceDuplicatedException;
+import com.yiting.toeflvoc.utils.ResourceNotFoundException;
 
 @RestController
 @RequestMapping(path="/batch")
 public class BatchController {
 	@Autowired
-	private CSVImporter csvImporter;
+	private RootCSVImporter rootCsvImporter;
 	
-	@RequestMapping(path="/", method=RequestMethod.GET)
-	public AjaxResponse importGRECSV() {
+	@Autowired
+	private StandardWordCSVImporter wordCsvImporter;
+	
+	@RequestMapping(path="/rootCSV", method=RequestMethod.POST)
+	public AjaxResponse importRootCSV() throws ResourceDuplicatedException, ResourceNotFoundException {
 		try {
-			int count = csvImporter.importGRERootCSV();
+			int count = rootCsvImporter.importGRERootCSV();
+			return AjaxResponse.successResponseWithMsg(String.format("Imported successfully, %s entries processed", count));
+		} catch (IOException e) {
+			return AjaxResponse.errorResponseWithMsg(e.getMessage());
+		}
+	}
+	
+	@RequestMapping(path="/greCSV/{fileName}/{categoryName}", method=RequestMethod.POST)
+	public AjaxResponse importGRECSV(@PathVariable String fileName, @PathVariable String categoryName) throws ResourceDuplicatedException, ResourceNotFoundException {
+		try {
+			int count = wordCsvImporter.importWordCSV(fileName, categoryName);
 			return AjaxResponse.successResponseWithMsg(String.format("Imported successfully, %s entries processed", count));
 		} catch (IOException e) {
 			return AjaxResponse.errorResponseWithMsg(e.getMessage());

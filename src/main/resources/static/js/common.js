@@ -21,3 +21,49 @@ function groupBy(list, keyGetter) {
     });
     return map;
 }
+
+var getRootBean = function(rootId, handler) {
+	$.get('/toefl/vocabularies/rootBean/' + rootId, function(data, status) {
+		if (status === 'success') {
+			if (data.status === 'success') {
+				rootBean = data.data.data;
+				handler(rootBean);
+			} else {
+				console.log('error');
+			}
+		} else {
+			console.log('error');
+		}	
+	});
+}
+
+var getWordBean = function(wordId, handler) {
+	$.get('/toefl/vocabularies/wordBean/' + wordId, function(data, status) {
+		if (status === 'success') {
+			if (data.status === 'success') {
+				wordBean = data.data.data;
+				return handler(wordBean);
+			} else {
+				console.log('error');
+			}
+		} else {
+			console.log('error');
+		}	
+	});
+}
+
+var getWordBeans = function(handler) {
+	$.get('/toefl/vocabularies/wordBeans', function(data, status) {
+		if (status === 'success') {
+			if (data.status === 'success') {
+				wordBeans = data.data.data;
+
+				handler(wordBeans);
+			} else {
+				console.log('error');
+			}
+		} else {
+			console.log('error');
+		}	
+	});	
+}

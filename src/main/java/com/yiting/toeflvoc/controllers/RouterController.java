@@ -12,7 +12,7 @@ public class RouterController {
 	@RequestMapping(path="/", method=RequestMethod.GET)
 	public String index(Model model) {
 		model.addAttribute("name", "Shiyao");
-		return "index";
+		return "pages/search-and-analyze";
 	}
 	
 	@RequestMapping(path="/search-and-analyze", method=RequestMethod.GET)

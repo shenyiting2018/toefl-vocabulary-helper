@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 @Configuration
 @PropertySource("classpath:application.properties")
 public class PropertyManager {
-
-	@Value("${gre_csv_file_path}")
+	
+	@Value("${csv_file_path}")
 	private String csvFilePath;
 
 	public String getCsvFilePath() {
@@ -20,6 +20,4 @@ public class PropertyManager {
 	public void setCsvFilePath(String csvFilePath) {
 		this.csvFilePath = csvFilePath;
 	}
-	
-	
 }

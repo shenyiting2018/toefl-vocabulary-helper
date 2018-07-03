@@ -60,7 +60,7 @@ public class VocabularyController {
 	}
 	
 	@RequestMapping(path="/rootBean/{rootIdStr}", method=RequestMethod.GET)
-	public @ResponseBody AjaxResponse getRoodBeanByRootId(@PathVariable String rootIdStr) {
+	public @ResponseBody AjaxResponse getRootBeanByRootId(@PathVariable String rootIdStr) {
 		RootBean bean;
 		try {
 			bean = beanService.getRootBean(Integer.valueOf(rootIdStr));
@@ -74,6 +74,20 @@ public class VocabularyController {
 		return resp;
 	}
 	
+	@RequestMapping(path="/wordBean/{wordIdStr}", method=RequestMethod.GET)
+	public @ResponseBody AjaxResponse getWordBeanByWordId(@PathVariable String wordIdStr) {
+		WordBean bean;
+		try {
+			bean = beanService.getWordBean(Integer.valueOf(wordIdStr));
+		} catch (NumberFormatException | ResourceNotFoundException e) {
+			return AjaxResponse.errorResponseWithMsg(e.getMessage());
+
+		}
+		
+		AjaxResponse resp = AjaxResponse.successResponse();
+		resp.putData("data", bean);
+		return resp;
+	}
 	
 	@RequestMapping(path="/wordBeans", method=RequestMethod.GET)
 	public @ResponseBody AjaxResponse getAllWordBeans() {
