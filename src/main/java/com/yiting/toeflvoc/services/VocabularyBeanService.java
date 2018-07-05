@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import com.yiting.toeflvoc.beans.AliasBean;
 import com.yiting.toeflvoc.beans.AnalyzeResultBean;
 import com.yiting.toeflvoc.beans.RootBean;
 import com.yiting.toeflvoc.beans.WordBean;
+import com.yiting.toeflvoc.models.Category;
 import com.yiting.toeflvoc.models.RootAliasMap;
 import com.yiting.toeflvoc.models.Word;
 import com.yiting.toeflvoc.models.WordCategoryMap;
@@ -38,13 +40,15 @@ public class VocabularyBeanService {
 
 	private Map<Integer, AliasBean> getAliasBeansCache() {
 		if (this.aliasBeansCache.isEmpty()) {
+			long t1 = System.currentTimeMillis();
+
 			List<RootAliasMap> maps = this.modelService.getAllRootAliasMaps();
 
 			for (RootAliasMap map : maps) {
 				this.aliasBeansCache.putIfAbsent(map.getAlias().getId(), new AliasBean(map.getAlias(), new ArrayList<>()));
 				this.aliasBeansCache.get(map.getAlias().getId()).getRootAliasMaps().add(map);
 			}
-			logger.info("aliasBeansCache reinited.");
+			logger.info(String.format("alisBeanCache reinited in %d milliseconds.", System.currentTimeMillis() - t1));
 		}
 
 		return this.aliasBeansCache;
@@ -52,6 +56,7 @@ public class VocabularyBeanService {
 
 	private Map<Integer, RootBean> getRootBeansCache() {
 		if (this.rootBeansCache.isEmpty()) {
+			long t1 = System.currentTimeMillis();
 			List<WordRootMap> wordRootMaps = this.modelService.getAllWordRootMaps();
 			List<RootAliasMap> rootAliasMaps = this.modelService.getAllRootAliasMaps();
 
@@ -64,32 +69,37 @@ public class VocabularyBeanService {
 				this.rootBeansCache.putIfAbsent(map.getRoot().getId(), new RootBean(map.getRoot(), new ArrayList<>(), new ArrayList<>()));
 				this.rootBeansCache.get(map.getRoot().getId()).getRootAliasMaps().add(map);
 			}
-			logger.info("rootBeansCache reinited.");
+
+			logger.info(String.format("rootBeansCache reinited in %d milliseconds.", System.currentTimeMillis() - t1));
 		}
 
 		return this.rootBeansCache;
 	}
-	
+
 	public void invalideCache() {
 		this.aliasBeansCache.clear();
 		this.rootBeansCache.clear();
 		this.wordBeansCache.clear();
-		
-		logger.info("All cache cleared");
+
+		//logger.info("All cache cleared");
 	}
 
+	@Transactional(readOnly=true)
 	private Map<Integer, WordBean> getWordBeansCache() {
 		if (this.wordBeansCache.isEmpty()) {
+			long t1 = System.currentTimeMillis();
 			List<Word> allWords = this.modelService.getAllWords();
-			
-			for (Word word : allWords) {
+			long t2 = System.currentTimeMillis();
+
+			for (int i = 0; i < allWords.size(); i++) {
+				Word word = allWords.get(i);
 				List<WordRootMap> wordRootMaps = this.modelService.getWordRootMapsByWord(word.getId());
-				List<WordCategoryMap> wordCategoryMap = this.modelService.getWordCategoryMapByWord(word.getId());
-				
-				this.wordBeansCache.putIfAbsent(word.getId(), new WordBean(word, wordRootMaps, wordCategoryMap));
+				//List<WordCategoryMap> wordCategoryMap = this.modelService.getWordCategoryMapByWord(word.getId());
+
+				this.wordBeansCache.putIfAbsent(word.getId(), new WordBean(word, wordRootMaps, null));
 			}
-			
-			logger.info("wordBeansCache reinited.");
+
+			logger.info(String.format("wordBeansCache reinited in %d milliseconds.", System.currentTimeMillis() - t1));
 		}
 
 		return this.wordBeansCache;
@@ -102,7 +112,7 @@ public class VocabularyBeanService {
 	public List<RootBean> getAllRootBeans() {
 		return new ArrayList<>(this.getRootBeansCache().values());
 	}
-	
+
 	public RootBean getRootBean(Integer rootId) throws ResourceNotFoundException {
 		RootBean rootBean = this.getRootBeansCache().get(rootId);
 
@@ -120,15 +130,14 @@ public class VocabularyBeanService {
 	}
 
 	public WordBean getWordBean(Integer wordId) throws ResourceNotFoundException {
-		WordBean wordBean = this.getWordBeansCache().get(wordId);
-
-		if (wordBean == null) {
-			String msg = String.format("Cache invalidated for some reason, received wordID: %s, but not in wordBeansCache, reinitiating wordcache", wordId);
-			logger.error(msg);
-			throw new ResourceNotFoundException(msg);
+		//WordBean wordBean = this.getWordBeansCache().get(wordId);
+		Word word = this.modelService.getWord(wordId);
+		if (word == null) {
+			return null;
+		} else {
+			List<WordRootMap> wrms = this.modelService.getWordRootMapsByWord(wordId);
+			return new WordBean(word, wrms, new ArrayList<>());
 		}
-
-		return wordBean;
 	}
 
 	@Transactional
@@ -136,7 +145,7 @@ public class VocabularyBeanService {
 		Set<Integer> rootIdSet = new HashSet<>();
 		List<AnalyzeResultBean> res = new ArrayList<>();
 		Word word = this.modelService.getWordByWordString(wordString);
-		
+
 		if (word != null) {
 			//If word already in DB, retrieve its current validated roots first.
 			WordBean bean = this.getWordBean(word.getId());
@@ -170,7 +179,7 @@ public class VocabularyBeanService {
 				}
 			}
 		}
-		
+
 		analysis.sort((a, b) -> {
 			return a.getRootString().compareTo(b.getRootString());
 		}); 

@@ -6,3 +6,5 @@ CREATE TABLE alias(
 ) ENGINE INNODB
 CHARACTER SET = utf8;
 
+CREATE INDEX alias_string_index
+on alias(alias_string);

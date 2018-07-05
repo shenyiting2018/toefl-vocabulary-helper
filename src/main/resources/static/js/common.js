@@ -52,6 +52,27 @@ var getWordBean = function(wordId, handler) {
 	});
 }
 
+var getCategoryWords = function(handler, categoryName, loadingDom) {
+	loadingDom.loading();
+	$.get('/toefl/vocabularies/categoryWords/' + categoryName, function(data, status) {
+		if (status === 'success') {
+			if (data.status === 'success') {
+				wordBeans = data.data.data;
+				
+				if (!!handler) {
+					handler(wordBeans);
+				}
+			} else {
+				console.log('error');
+			}
+			loadingDom.loading('stop')
+		} else {
+			console.log('error');
+			loadingDom.loading('stop')
+		}	
+	});	
+}
+
 var getWordBeans = function(handler) {
 	$.get('/toefl/vocabularies/wordBeans', function(data, status) {
 		if (status === 'success') {

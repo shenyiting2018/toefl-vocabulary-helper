@@ -23,7 +23,9 @@ public class WordDAO {
 	private static final String GET_WORD_BY_WORD_STRING = "from Word where wordString = :wordString";
 
 	public List<Word> getAllWords() {
-		List<Word> words = (List<Word>) wordRepo.findAll();
+		//List<Word> words = (List<Word>) wordRepo.findAll();
+		List<Word> words = this.entityManager.createQuery("from Word")
+				.getResultList();
 		return words;
 	}
 

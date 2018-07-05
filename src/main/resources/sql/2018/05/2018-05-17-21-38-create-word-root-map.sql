@@ -8,3 +8,11 @@ CREATE TABLE word_root_map(
 	FOREIGN KEY (root_id) REFERENCES root(id)
 ) ENGINE INNODB
 CHARACTER SET = utf8;
+
+
+
+CREATE INDEX word_root_map_word_index
+on word_root_map(word_id);
+
+CREATE INDEX word_root_map_root_index
+on word_root_map(root_id);

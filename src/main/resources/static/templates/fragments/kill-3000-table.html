@@ -1,0 +1,48 @@
+<div th:fragment="kill-3000-table">
+	<div class="x_panel">
+		<div class="x_title">
+			<div class="row">
+				<div class="col-md-4">
+					<h2>Words</h2>
+				</div>
+				<div class="col-md-8">
+					<button id="switch-meanings-display" class="btn btn-md btn-warning">Hide</button>
+					<button id="revert-meaning-display" class="btn btn-md btn-danger">revert</button>
+				</div>
+			</div>
+			<div
+				th:replace="fragments/panel-navbar-toolbox :: panel-navbar-toolbox"></div>
+			<div class="clearfix"></div>
+		</div>
+		<div class="x_content">
+			<p class="text-muted font-13 m-b-30"></p>
+			<table id="kill-3000-table"
+				class="table table-striped table-bordered button-table">
+				<thead>
+					<tr>
+						<!-- 						<th>Action</th>
+ -->					<th>No.</th>
+						<th>Word</th>
+						<th>Meanings</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<script id="root-words-table-data-template"
+		type="text/x-handlebars-template">
+		{{#rootWordsTableDataHelper wordsOfRoot}}{{this}}{{/rootWordsTableDataHelper}}
+    </script>
+</div>
+
+<div class="ProfileCard u-cf root-search-clickable">
+	<div class="ProfileCard-details">
+		<div class="ProfileCard-realName">{{aliasString}}</div>
+		<div class="ProfileCard-screenName">@{{rootString}}</div>
+		<div class="ProfileCard-description">{{#each
+			rootMeaning}}{{this}}{{/each}}</div>
+	</div>
+</div>

@@ -14,6 +14,7 @@ import com.yiting.toeflvoc.beans.AnalyzeResultBean;
 import com.yiting.toeflvoc.beans.RootBean;
 import com.yiting.toeflvoc.beans.WordBean;
 import com.yiting.toeflvoc.models.RootAliasMap;
+import com.yiting.toeflvoc.models.Word;
 import com.yiting.toeflvoc.services.VocabularyBeanService;
 import com.yiting.toeflvoc.services.VocabularyModelService;
 import com.yiting.toeflvoc.utils.AjaxResponse;
@@ -95,6 +96,15 @@ public class VocabularyController {
 		
 		AjaxResponse resp = AjaxResponse.successResponse();
 		resp.putData("data", beans);
+		return resp;
+	}
+	
+	@RequestMapping(path="/categoryWords/{categoryName}", method=RequestMethod.GET)
+	public @ResponseBody AjaxResponse getCategoryWords(@PathVariable String categoryName) {
+		List<Word> words = modelService.getCategoryWords(categoryName);
+		
+		AjaxResponse resp = AjaxResponse.successResponse();
+		resp.putData("data", words);
 		return resp;
 	}
 	

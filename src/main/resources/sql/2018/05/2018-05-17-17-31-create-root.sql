@@ -7,3 +7,5 @@ CREATE TABLE root(
 ) ENGINE INNODB 
 CHARACTER SET = utf8;
 
+CREATE INDEX root_string_index
+on root (root_string);

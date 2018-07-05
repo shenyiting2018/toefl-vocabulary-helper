@@ -23,10 +23,10 @@ public class BatchController {
 	@Autowired
 	private StandardWordCSVImporter wordCsvImporter;
 	
-	@RequestMapping(path="/rootCSV", method=RequestMethod.POST)
-	public AjaxResponse importRootCSV() throws ResourceDuplicatedException, ResourceNotFoundException {
+	@RequestMapping(path="/rootCSV/{fileName}", method=RequestMethod.POST)
+	public AjaxResponse importRootCSV(@PathVariable String fileName) throws ResourceDuplicatedException, ResourceNotFoundException {
 		try {
-			int count = rootCsvImporter.importGRERootCSV();
+			int count = rootCsvImporter.importGRERootCSV(fileName);
 			return AjaxResponse.successResponseWithMsg(String.format("Imported successfully, %s entries processed", count));
 		} catch (IOException e) {
 			return AjaxResponse.errorResponseWithMsg(e.getMessage());

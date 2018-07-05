@@ -42,10 +42,10 @@ public class RootCSVImporter {
     @Autowired
     private PropertyManager propertyManager;
     
-	public int importGRERootCSV() throws IOException, ResourceDuplicatedException, ResourceNotFoundException {
-		logger.info("Start importing csv file");
+	public int importGRERootCSV(String fileName) throws IOException, ResourceDuplicatedException, ResourceNotFoundException {
+		logger.info("Start importing " + fileName);
 		
-		String location = this.propertyManager.getCsvFilePath();
+		String location = this.propertyManager.getCsvFilePath() + fileName;
 		final Resource fileResource = this.resourceLoader.getResource(location);
 		File file = fileResource.getFile();
 		Reader in = new FileReader(file);
@@ -84,7 +84,7 @@ public class RootCSVImporter {
 			}
 			
 			Root root = this.vocabularyService.addRoot(rootString, meaning);
-			logger.debug(String.format("Imported root %s with meaning %s", root.getRootString(), root.getMeanings().toString()));
+			// logger.debug(String.format("Imported root %s with meaning %s", root.getRootString(), root.getMeanings().toString()));
 			for (String aliasString : aliasStrings) {
 				Alias alias = this.vocabularyService.addAlias(aliasString);
 				this.vocabularyService.addRootAliasMap(root, alias, "");
@@ -96,6 +96,7 @@ public class RootCSVImporter {
 			}
 			
 			number++;
+			logger.info(String.format("Imported %s record", number));
 		}
 		logger.info(String.format("Importing CSV finished, %s records processes", number));
 		return number;

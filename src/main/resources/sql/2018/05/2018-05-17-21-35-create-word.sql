@@ -7,3 +7,6 @@ CREATE TABLE word(
 ) ENGINE INNODB
 CHARACTER SET = utf8;
 
+
+CREATE INDEX word_string_index
+on word (word_string);

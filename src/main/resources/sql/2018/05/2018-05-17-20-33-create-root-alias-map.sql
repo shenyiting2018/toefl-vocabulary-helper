@@ -8,3 +8,9 @@ CREATE TABLE root_alias_map(
 	FOREIGN KEY (alias_id) REFERENCES alias(id)
 ) ENGINE INNODB
 CHARACTER SET = utf8;
+
+CREATE INDEX root_alias_map_root_index
+on root_alias_map(root_id);
+
+CREATE INDEX root_alias_map_alias_index
+on root_alias_map(alias_id);

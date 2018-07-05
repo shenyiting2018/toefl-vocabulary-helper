@@ -80,7 +80,8 @@ public class StandardWordCSVImporter {
 			}
 			
 			this.vocabularyService.addWordCategoryMap(word, category);
-			
+			logger.info(String.format("Imported %s record", number));
+
 			number++;
 		}
 		

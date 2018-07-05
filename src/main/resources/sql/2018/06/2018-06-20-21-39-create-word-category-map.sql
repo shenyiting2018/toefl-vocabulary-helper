@@ -7,3 +7,10 @@ CREATE TABLE word_category_map(
 	FOREIGN KEY (category_id) REFERENCES category(id)
 ) ENGINE INNODB
 CHARACTER SET = utf8;
+
+
+CREATE INDEX word_category_map_category_index
+on word_category_map(category_id);
+
+CREATE INDEX word_category_map_word_index
+on word_category_map(word_id);

@@ -1,7 +1,9 @@
 package com.yiting.toeflvoc.services;
 
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.NoResultException;
 
@@ -232,16 +234,16 @@ public class VocabularyModelService {
 	@Transactional
 	public Word getWordByWordString(String wordString) {
 		Word word = null;
-		// long time1 = System.currentTimeMillis();
+		 long time1 = System.currentTimeMillis();
 		try {
 			word = this.wordDAO.getWordByWordString(wordString); 
-		//	long time2 = System.currentTimeMillis();
-		//	System.out.println("dao use milli: " + (time2 - time1));
+			long time2 = System.currentTimeMillis();
+			System.out.println("dao use milli: " + (time2 - time1));
 		} catch (NoResultException e) {
 		}
 
-	//	long time3 = System.currentTimeMillis();
-	//	System.out.println("entire: " + (time3 - time1));
+		long time3 = System.currentTimeMillis();
+		System.out.println("entire: " + (time3 - time1));
 		return word;
 	}
 	
@@ -258,7 +260,7 @@ public class VocabularyModelService {
 	}
 	
 	@Transactional
-	public Category getCategoryByCategoryName(String categoryName) throws ResourceNotFoundException {
+	public Category getCategoryByCategoryName(String categoryName) {
 		Category category = null;
 		try {
 			category = this.categoryDAO.getCategoryByCategoryString(categoryName);
@@ -267,6 +269,25 @@ public class VocabularyModelService {
 		}
 		
 		return category;
+	}
+	
+
+	public List<Word> getCategoryWords(String categoryName) {		
+		List<Word> words = new ArrayList<>();
+		Category category = this.getCategoryByCategoryName(categoryName);
+
+		if (category != null) {
+			List<WordCategoryMap> maps = this.getWordCategoryMapByCategory(category.getId());
+			words = maps.stream()
+					.map(map -> map.getWord())
+					.sorted((a, b) -> {
+						return a.getWordString().compareTo(b.getWordString());
+					})
+					.collect(Collectors.toList());
+
+		}
+
+		return words;
 	}
 	
 	public List<Word> getAllWords() {

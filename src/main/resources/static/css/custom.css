@@ -12,3 +12,8 @@ td.details-control {
 tr.shown td.details-control {
     background: url('../resources/details_close.png') no-repeat center center;
 }
+
+.word-meaning-hidden {
+	width: 80%;
+}
+

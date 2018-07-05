@@ -32,4 +32,10 @@ public class RouterController {
 		model.addAttribute("name", "Shiyao");
 		return "pages/word-manager";
 	}
+	
+	@RequestMapping(path="/kill-3000", method=RequestMethod.GET)
+	public String kill3000(Model model) {
+		model.addAttribute("name", "Shiyao");
+		return "pages/kill-3000";
+	}
 }
