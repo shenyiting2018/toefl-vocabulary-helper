@@ -135,8 +135,9 @@ public class VocabularyBeanService {
 		if (word == null) {
 			return null;
 		} else {
-			List<WordRootMap> wrms = this.modelService.getWordRootMapsByWord(wordId);
-			return new WordBean(word, wrms, new ArrayList<>());
+			List<WordRootMap> wordRootMaps = this.modelService.getWordRootMapsByWord(word.getId());
+			List<WordCategoryMap> wordCategoryMaps = this.modelService.getWordCategoryMapByWord(word.getId());
+			return new WordBean(word, wordRootMaps, wordCategoryMaps);
 		}
 	}
 
@@ -190,4 +191,29 @@ public class VocabularyBeanService {
 	private boolean match(String a, String b) {
 		return a.contains(b);
 	}
+	
+	@Transactional
+	public List<WordBean> getCategoryWordBeans(String categoryName) {		
+		List<WordBean> wordBeans = new ArrayList<>();
+		Category category = this.modelService.getCategoryByCategoryName(categoryName);
+		
+		List<Word> words = new ArrayList<>();
+		if (category != null) {
+			List<WordCategoryMap> maps = this.modelService.getWordCategoryMapByCategory(category.getId());
+			words = maps.stream()
+					.map(map -> map.getWord())
+					.sorted((a, b) -> {
+						return a.getWordString().compareTo(b.getWordString());
+					})
+					.collect(Collectors.toList());
+			
+			for (Word word : words) {
+				List<WordRootMap> wordRootMaps = this.modelService.getWordRootMapsByWord(word.getId());
+				wordBeans.add(new WordBean(word, wordRootMaps, null));
+			}
+		}
+
+		return wordBeans;
+	}
+	
 }

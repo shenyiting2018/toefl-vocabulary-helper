@@ -21,7 +21,9 @@
 				<thead>
 					<tr>
 						<!-- 						<th>Action</th>
- -->					<th>No.</th>
+ -->
+						<th>No.</th>
+						<th class="hidden">ID</th>
 						<th>Word</th>
 						<th>Meanings</th>
 					</tr>
@@ -31,18 +33,5 @@
 			</table>
 		</div>
 	</div>
-
-	<script id="root-words-table-data-template"
-		type="text/x-handlebars-template">
-		{{#rootWordsTableDataHelper wordsOfRoot}}{{this}}{{/rootWordsTableDataHelper}}
-    </script>
 </div>
 
-<div class="ProfileCard u-cf root-search-clickable">
-	<div class="ProfileCard-details">
-		<div class="ProfileCard-realName">{{aliasString}}</div>
-		<div class="ProfileCard-screenName">@{{rootString}}</div>
-		<div class="ProfileCard-description">{{#each
-			rootMeaning}}{{this}}{{/each}}</div>
-	</div>
-</div>

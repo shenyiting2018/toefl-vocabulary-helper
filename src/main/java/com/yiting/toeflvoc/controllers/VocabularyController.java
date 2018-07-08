@@ -2,6 +2,8 @@ package com.yiting.toeflvoc.controllers;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,8 @@ public class VocabularyController {
 	
 	@Autowired
 	private VocabularyModelService modelService;
+	
+	private final Logger logger = LoggerFactory.getLogger(VocabularyController.class);
 	
 	@RequestMapping(path="/root", method=RequestMethod.POST)
 	public @ResponseBody AjaxResponse addRoot(@RequestParam String rootString) {
@@ -101,8 +105,10 @@ public class VocabularyController {
 	
 	@RequestMapping(path="/categoryWords/{categoryName}", method=RequestMethod.GET)
 	public @ResponseBody AjaxResponse getCategoryWords(@PathVariable String categoryName) {
+		long t1 = System.currentTimeMillis();
 		List<Word> words = modelService.getCategoryWords(categoryName);
-		
+		//List<WordBean> words = this.beanService.getCategoryWordBeans(categoryName);
+		logger.info(String.format("Bean retrieved in millis: %s", (System.currentTimeMillis() - t1)));
 		AjaxResponse resp = AjaxResponse.successResponse();
 		resp.putData("data", words);
 		return resp;

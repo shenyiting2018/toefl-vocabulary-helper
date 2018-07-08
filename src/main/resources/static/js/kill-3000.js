@@ -1,19 +1,23 @@
-function init_Kill3000DataTables(hiddenButtonHandler) {
 
+function init_Kill3000DataTables() {
 	console.log('run_datatables');
 
 	if( typeof ($.fn.DataTable) === 'undefined'){ return; }
 	console.log('init_DataTables');
 
-	var handleKill3000DataTableButtons= function() {
+	var handleKill3000DataTableButtons = function() {
 		if ($("#kill-3000-table").length) {
-			$("#kill-3000-table").DataTable({
+			var table = $("#kill-3000-table").DataTable({
 				pagingType: "input",
 				pageLength: 50,
 				dom: "Blfrtip",
 				fnDrawCallback: function(e) {
 					hiddenButtonHandler();
+					detailsControlButtonHandler();
 				},
+				columnDefs: [
+					    { "visible": false, "targets": 1 }
+					  ],
 				buttons: [
 					{
 						extend: "copy",
@@ -81,19 +85,172 @@ var hiddenButtonHandler = function() {
 	});
 }
 
+var detailsControlButtonHandler = function(table) {
+	$('.details-control').off('click');
+	$('#kill-3000-table tbody').off('click', 'button.details-control');
+	$('#kill-3000-table tbody').on('click', 'button.details-control', function () {
+	        var tr = $(this).closest('tr');
+	        
+	        var table = $('#kill-3000-table').DataTable();
+	        var row = table.row( tr );
+	 
+	        if ( row.child.isShown() ) {
+	            // This row is already open - close it
+	            row.child.hide();
+	            tr.removeClass('shown');
+	            $(this).removeClass('btn-info');
+	            $(this).addClass('btn-success');
+	        }
+	        else {
+	        	var wordId = row.data()[1];
+	        	var that = $(this);
+	        	var wordDetailHandlerClojure = function(wordBean) {
+	        		wordDetailHandler = function() {
+	        			var child = subRowFormatter(wordBean);
+	        			row.child(child).show();
+	    	            tr.addClass('shown');
+	    	            that.addClass('btn-info');
+	    	            that.removeClass('btn-success');
+	    	            
+	    	            $('.word-detail-root-button').off('click');
+	    	            $('.word-detail-analyze-button').off('click');
+	    	            
+	    	            $('.word-detail-root-button').on('click', function(event) {
+	    	            	var buttonDOM = $(event.target);
+	    	            	var rowDOM = buttonDOM.closest('.word-detail-row').first();
+	    	            	var tableDOM = rowDOM.find('.word-detal-right-table-div').first();
+	    	            	
+	    	            	var rootId = event.target.value;
+	    	            	
+	    	            	var renderRootWordsHandler = function(rootBean) {
+	    	            		var root = rootBean.root;
+	    	            		var words = rootBean.wordRootMaps;
+	    	            		var rootAliasMaps = rootBean.rootAliasMaps;
+	    	            		var aliases = '';
+	    	            		for (var i in rootAliasMaps) {
+	    	            			aliases += rootAliasMaps[i].alias.aliasString + ',';
+	    	            		}
+	    	            		
+	    	            		var tableRows = '';
+	    	            		for (var j in words) {
+	    	            			tableRows += '<tr>'+
+	    	            							'<td>' + words[j].word.wordString + '</td>'+
+	    	            							'<td>' + words[j].word.meanings + '</td>'+
+	    	            						'</tr>'
+	    	            		}
+	    	            		var titleDOM = '<div class="row"><h4>' + '<span class="text-danger">' + root.rootString + '</span>: ' + aliases + '</h4></div>';
+	    	            		var subTableDOM = '<div class="row">'+
+	    	            							'<table class="table table-striped table-bordered">'+
+	    	            								'<thead>'+
+	    	            									'<th>Word</th>'+
+	    	            									'<th>Meanings</th>'+
+    	            									'</thead>'+
+    	            									'<tbody>'+
+    	            									tableRows+
+    	            									'</tbody>'+
+	            									'</table>'+
+            									'</div>';
+		    	            	tableDOM.empty();
+	    	            		tableDOM.append(titleDOM + subTableDOM);
+	    	            	}
+	    	            	
+	    	            	getRootBean(rootId, renderRootWordsHandler, null);
+	    	            	
+	    	            });
+	    	            
+	    	            $('.word-detail-analyze-button').on('click', function() {
+	    	            	var buttonDOM = $(event.target);
+	    	            	var rowDOM = buttonDOM.closest('.word-detail-row').first();
+	    	            	var tableDOM = rowDOM.find('.word-detal-right-table-div').first();
+	    	            	
+	    	            	var wordString = event.target.value;;
+	    	            	
+	    	            	var renderAnalyzeResultsHandler = function(results) { 	            		
+	    	            		var tableRows = '';
+	    	            		for (var k in results) {
+	    	            			var result = results[k];
+	    	            			var verified = !!result.verified? '<i class="fa fa-check fa-2x centered" style="color:#4ef442;"></i>' : '<button class="btn btn-info">Verify!</button>';
+	    	            			tableRows += '<tr>'+
+	    	            							'<td>' + result.aliasString + '</td>'+
+	    	            							'<td>' + result.rootString + '</td>'+	    	            						
+	    	            							'<td>' + result.rootMeanings + '</td>'+
+	    	            							'<td>' + result.description + '</td>'+
+	    	            							'<td>' + verified + '</td>'+
+	    	            						'</tr>'
+	    	            		}
+	    	            		
+	    	            		var subTableDOM = '<div class="row">'+
+	    	            							'<table class="table table-striped table-bordered">'+
+	    	            								'<thead>'+
+	    	            									'<th>Root Alias</th>'+
+	    	            									'<th>Root</th>'+
+	    	            									'<th>Meanings</th>'+
+	    	            									'<th>Description</th>'+
+	    	            									'<th>Verified</th>'+
+    	            									'</thead>'+
+    	            									'<tbody>'+
+    	            									tableRows+
+    	            									'</tbody>'+
+	            									'</table>'+
+            									'</div>';
+		    	            	tableDOM.empty();
+	    	            		tableDOM.append(subTableDOM);
+	    	            	}
+	    	            	
+	    	            	analyzeWord(wordString, renderAnalyzeResultsHandler, null);
+	    	            });
+	        		}
+	        		
+	        		wordDetailHandler();
+	        	}
+	        	getWordBean(wordId, wordDetailHandlerClojure);
+	        }
+	    } );
+}
+
+var subRowFormatter = function(wordBean) {
+	 // `d` is the original data object for the row
+	var wordRootMaps = wordBean.wordRootMaps;
+	var wordCategoryMaps = wordBean.wordCategoryMaps;
+	
+	var wordRootElement = '';
+	for (var i in wordRootMaps) {
+		var root = wordRootMaps[i].root;
+		wordRootElement += ' <button class="btn btn-danger btn-sm word-detail-root-button" value=' + root.id + '>' + root.rootString + ': ' + root.meanings + '</button>';
+	}
+	wordRootElement += ' <button class="btn btn-primary btn-sm word-detail-analyze-button" value="' + wordBean.word.wordString + '">Analyze</button>';
+    return '<div class="row word-detail-row">' +
+    			'<div class="col-md-4">' + 
+    				'<table table-striped table-bordered cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
+				        '<tr>'+
+				            '<td>Word ID:</td>'+
+				            '<td>'+ wordBean.word.id +'</td>'+
+				        '</tr>'+
+				        '<tr>'+
+				        	'<td>Roots:</td>' + 
+				        	'<td>' + wordRootElement + '</td>'+
+				        '</tr>'+
+				    '</table>'+
+		    	'</div>'+
+		    	'<div class="col-md-8 word-detal-right-table-div">'+
+		    	'</div>'+
+		   '</div>';
+}
+
 $(document).ready(function() {
 	init_Kill3000DataTables(hiddenButtonHandler);
-
+	
 	var drawWordsTablehandler = function(categoryWords) {
 		dt = $('#kill-3000-table').DataTable();
 		dt.clear();
 		var number = 1;
 		for (word of categoryWords) {
-			button = '<button class="btn btn-info centered-text kill-3000-table-cell-button" value=' + word.id+ '>Details</button>';
 			wordMeanings = '<span class="table-word-meanings-column" value=' + word.meanings + '>'
 			+ buildDisplayedMeanings(word.meanings)
 			+ '</span>'
-			node = dt.row.add([number, word.wordString, wordMeanings]);
+			
+			numberButton = '<button class="btn btn-success  btn-circle details-control">' + number + '</button>';
+			node = dt.row.add([numberButton, word.id, '<b>' + word.wordString + '</b>', wordMeanings]);
 			number += 1;
 		}
 
