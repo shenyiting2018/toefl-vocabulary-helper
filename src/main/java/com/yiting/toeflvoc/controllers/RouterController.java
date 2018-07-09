@@ -76,4 +76,9 @@ public class RouterController {
 	public String logout(){
 	     return "pages/logout";
 	}
+	
+	@RequestMapping(path="/register", method = RequestMethod.GET)
+	public String register(){
+	     return "pages/register";
+	}
 }

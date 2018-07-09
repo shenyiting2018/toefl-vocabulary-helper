@@ -43,31 +43,40 @@
 			id="signin"></a>
 
 		<div class="login_wrapper">
-			<div class="animate form login_form">
+			<div class="animate form login_form ">
 				<section class="login_content">
-					<div th:if="${param.error}">Invalid username and password.</div>
-					<div th:if="${param.logout}">You have been logged out.</div>
-					<form th:action="@{/login}" method="post">
-						<h1>Login</h1>
-						<div class="form-group">
-							<input type="text" class="form-control" placeholder="Username"
-								required="" name="username" />
+					<form th:action="@{/register}" method="post">
+						<h1>Create Account</h1>
+						<div>
+							<input type="text" class="form-control" placeholder="Email..." name="email"
+								required="" />
 						</div>
-						<div class="form-group">
-							<input type="password" class="form-control"
-								placeholder="Password" name="password" required="" />
+						<div>
+							<input type="password" class="form-control" name="password"
+								placeholder="Password" required="" />
 						</div>
-						<div class="form-group">
-							<input class="btn btn-primary centered login-register-button" type="submit"
-								value="Log In" />
+						<div>
+							<input type="password" class="form-control" name="retypePassword"
+								placeholder="Retype Password..." required="" />
+						</div>
+						<div>
+							<input type="text" class="form-control" placeholder="First name..." name="firstName"
+								required="" />
+						</div>
+						<div>
+							<input type="text" class="form-control" placeholder="Last name..." name="lastName"
+								required="" />
+						</div>
+						<div>
+							<input type="submit" class="btn btn-info centered login-register-button" title="Register!">
 						</div>
 
 						<div class="clearfix"></div>
 
 						<div class="separator">
 							<p class="change_link">
-								New to site? <a th:href="@{/register}" class="to_register">
-									Create Account </a>
+								Already a member ? <a th:href="@{/login}" class="to_register">
+									Log in </a>
 							</p>
 
 							<div class="clearfix"></div>
@@ -77,7 +86,7 @@
 								<h1>
 									<i class="fa fa-paw"></i> Smart Louis!
 								</h1>
-								<p>©2016 All Rights Reserved. Smart Louis! Your best
+								<p>©2018 All Rights Reserved. Smart Louis! Your best
 									personal assistant!</p>
 							</div>
 						</div>
