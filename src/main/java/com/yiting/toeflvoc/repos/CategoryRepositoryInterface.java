@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.yiting.toeflvoc.models.Category;
 
-public interface CategoryRepositoryInterface extends JpaRepository <Category, Long>{
+public interface CategoryRepositoryInterface extends JpaRepository <Category, Long> {
 
 }
