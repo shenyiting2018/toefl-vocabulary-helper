@@ -1,29 +1,33 @@
 package com.yiting.toeflvoc.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
+import com.yiting.toeflvoc.services.UserService;
+
 @Configuration
+@EnableWebSecurity
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private AccessDeniedHandler accessDeniedHandler;
+	
+	@Autowired
+	private UserService userService;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
 		http.csrf().disable()
 		.authorizeRequests()
-		.antMatchers(
-				"/", 
-				"/toefl/**", 
-				"/toefl/kill-3000**")
-				.permitAll()
 		.antMatchers(
 				"/resources/**", 
 				"/static/**",
@@ -34,17 +38,29 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 				"/pages/**",
 				"/templates/**",
 				"/build/**")
-				.permitAll()
+			.permitAll()
 		.antMatchers("/admin/**").hasAnyRole("ADMIN")
+		.antMatchers("/super/**").hasAnyRole("SUPER")
 		.antMatchers("/user/**").hasAnyRole("USER")
-		.anyRequest().authenticated()
-		.and()
+			.anyRequest().authenticated()
+			.and()
 		.formLogin()
-		.loginPage("/login").permitAll()
+			.loginPage("/login")
+			.permitAll()
+			.and()
+		.logout()
+			.permitAll()/*
 		.and()
-		.logout().permitAll()
-		.and()
-		.exceptionHandling().accessDeniedHandler(accessDeniedHandler);
+		.exceptionHandling().accessDeniedHandler(accessDeniedHandler)*/;
+	}
+
+	@Bean
+	public DaoAuthenticationProvider authenticationProvider() {
+	    DaoAuthenticationProvider authProvider
+	      = new DaoAuthenticationProvider();
+	    authProvider.setUserDetailsService(userService);
+	    authProvider.setPasswordEncoder(encoder());
+	    return authProvider;
 	}
 
 	@Override
@@ -54,12 +70,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/resources/**"); // #3
 	}
 
-	// create two users, admin and user
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication()
-		.withUser("user").password("password").roles("USER")
-		.and()
-		.withUser("admin").password("password").roles("ADMIN");
+	@Bean
+	public PasswordEncoder encoder() {
+	    return new CustomPasswordEncoder();
 	}
 }
