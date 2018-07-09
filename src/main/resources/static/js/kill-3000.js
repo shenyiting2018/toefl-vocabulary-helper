@@ -138,7 +138,7 @@ var detailsControlButtonHandler = function(table) {
 	    	            							'<td>' + words[j].word.meanings + '</td>'+
 	    	            						'</tr>'
 	    	            		}
-	    	            		var titleDOM = '<div class="row"><h4>' + '<span class="text-danger">' + root.rootString + '</span>: ' + aliases + '</h4></div>';
+	    	            		var titleDOM = '<div class="row"><h4>' + '<span class="text-danger">' + root.rootString + ':[' + root.meanings + ']' +  '</span>: ' + aliases + '</h4></div>';
 	    	            		var subTableDOM = '<div class="row">'+
 	    	            							'<table class="table table-striped table-bordered">'+
 	    	            								'<thead>'+

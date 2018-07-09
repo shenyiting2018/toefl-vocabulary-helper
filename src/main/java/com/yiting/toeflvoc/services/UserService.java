@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.yiting.toeflvoc.beans.UserBean;
 import com.yiting.toeflvoc.daos.UserDAO;
 import com.yiting.toeflvoc.models.Role;
 import com.yiting.toeflvoc.models.User;
@@ -56,7 +57,16 @@ public class UserService implements UserDetailsService{
             grantedAuthorities.add(new SimpleGrantedAuthority(role.getRole()));
         }
         
-		UserDetails userDetails = new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), grantedAuthorities);
-		return userDetails;
+		//UserDetails userDetails = new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), grantedAuthorities);
+		UserDetails userDetails = new UserBean(
+				user.getId(), 
+				user.getEmail(),
+				user.getPassword(), 
+				user.getFirstName(),
+				user.getLastName(),
+				user.getStatusCode(),
+				grantedAuthorities);
+
+		return userDetails;		
 	}
 }

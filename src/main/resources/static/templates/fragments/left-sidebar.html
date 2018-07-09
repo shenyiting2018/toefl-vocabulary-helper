@@ -15,7 +15,7 @@
 						class="img-circle profile_img">
 				</div>
 				<div class="profile_info">
-					<span>Welcome,</span>
+					<span>Welcome!</span>
 					<h2 th:text="${name}"></h2>
 				</div>
 			</div>
@@ -62,10 +62,12 @@
 					<span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
 				</a> <a data-toggle="tooltip" data-placement="top" title="Lock"> <span
 					class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-				</a> <a data-toggle="tooltip" data-placement="top" title="Logout"
-					href="login.html"> <span class="glyphicon glyphicon-off"
-					aria-hidden="true"></span>
 				</a>
+				<form id="leftbar-logout" th:action="@{/logout}">
+					<a data-toggle="tooltip" data-placement="top" title="Logout"
+						href="#" onclick="document.getElementById('leftbar-logout').submit();">
+				</form>
+				<span class="glyphicon glyphicon-off" aria-hidden="true"></span> </a>
 			</div>
 			<!-- /menu footer buttons -->
 		</div>
