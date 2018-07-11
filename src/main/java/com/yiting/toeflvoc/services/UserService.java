@@ -1,6 +1,7 @@
 package com.yiting.toeflvoc.services;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.NoResultException;
@@ -19,8 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.yiting.toeflvoc.beans.UserBean;
 import com.yiting.toeflvoc.daos.UserDAO;
+import com.yiting.toeflvoc.models.Category;
 import com.yiting.toeflvoc.models.Role;
 import com.yiting.toeflvoc.models.User;
+import com.yiting.toeflvoc.models.Word;
+import com.yiting.toeflvoc.models.WordCategoryMap;
 
 @Service
 public class UserService implements UserDetailsService{
@@ -28,10 +32,16 @@ public class UserService implements UserDetailsService{
 	@Autowired
 	private UserDAO userDao;
 	
+	@Autowired
+	private VocabularyModelService modelService;
+	
 	private final Logger logger = LoggerFactory.getLogger(UserService.class);
+	
+	private final String SUPERUSER = "superuser";
+	private final String INVITATION_CODE = "ADS3WNC2";
 
 	@Transactional(readOnly=false)
-	public User registerUser(String email, String password, String retypePassword, String firstName, String lastName) throws Exception {
+	public User registerUser(String email, String password, String retypePassword, String firstName, String lastName, String invitationCode) throws Exception {
 		User user = this.getUserByEmail(email);
 		
 		if (user != null) {
@@ -40,7 +50,9 @@ public class UserService implements UserDetailsService{
 			if (StringUtils.isBlank(email)
 					|| StringUtils.isBlank(password)
 					|| StringUtils.isBlank(retypePassword)
-					|| !password.equals(retypePassword)) {
+					|| !password.equals(retypePassword)
+					|| SUPERUSER.equals(email)
+					|| !INVITATION_CODE.equals(invitationCode)) {
 				throw new Exception("Invalid Input");
 			}
 			
@@ -64,13 +76,32 @@ public class UserService implements UserDetailsService{
 		return user;
 	}
 	
+	@Transactional
 	private void initializeUser(User user) {
+		User superUser = this.getSuperuser();
 		
+		List<Category> superUserCategories = this.modelService.getUserCategories(superUser.getId());
+		for (Category superUserCategory : superUserCategories) {
+			Category category = this.modelService.addCategory(superUserCategory.getCategoryName(), user);
+			int count = 0;
+			List<Word> superUserCategoryWords = this.modelService.getCategoryWords(category.getCategoryName(), superUser.getId());
+			for (Word superUserCategoryWord : superUserCategoryWords) {
+				this.modelService.addWordCategoryMap(superUserCategoryWord, category);
+				logger.info(String.format("%s", count++));
+			}
+			
+			logger.info(String.format("Initialized %s for user", category.getCategoryName()));
+		}
 	}
 	
 	@Transactional
 	public Role getRoleByName(String role) {
 		return this.userDao.getRoleByName(role);
+	}
+	
+	@Transactional
+	public User getSuperuser() {
+		return this.getUserByEmail(SUPERUSER);
 	}
 	
 	@Transactional

@@ -1,18 +1,7 @@
-CREATE TABLE user_word_map(
-	id int NOT NULL AUTO_INCREMENT,
-	word_id int NOT NULL,
-	user_id int NOT NULL,
-	list CHAR(255),
-	proficiency int default 0,
-	PRIMARY KEY(id),
-	FOREIGN KEY (word_id) REFERENCES word(id),
-	FOREIGN KEY (user_id) REFERENCES user(id)
-) ENGINE INNODB
-CHARACTER SET = UTF8MB4;
+alter table category add column user_id int not null default 1;
+ALTER TABLE category ADD CONSTRAINT category_user_id FOREIGN KEY (user_id) REFERENCES user(id);
 
+alter table category add column status_code int not null default 1 ;
 
-CREATE INDEX user_word_map_user_index
-on user_word_map(user_id);
-
-CREATE INDEX word_category_map_word_index
-on user_word_map(word_id);
+CREATE INDEX category_user_id_index
+on category (user_id);

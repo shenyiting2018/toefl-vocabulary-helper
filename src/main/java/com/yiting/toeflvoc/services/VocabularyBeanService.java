@@ -17,9 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.yiting.toeflvoc.beans.AliasBean;
 import com.yiting.toeflvoc.beans.AnalyzeResultBean;
 import com.yiting.toeflvoc.beans.RootBean;
+import com.yiting.toeflvoc.beans.UserWordBean;
 import com.yiting.toeflvoc.beans.WordBean;
 import com.yiting.toeflvoc.models.Category;
 import com.yiting.toeflvoc.models.RootAliasMap;
+import com.yiting.toeflvoc.models.User;
 import com.yiting.toeflvoc.models.Word;
 import com.yiting.toeflvoc.models.WordCategoryMap;
 import com.yiting.toeflvoc.models.WordRootMap;
@@ -192,7 +194,7 @@ public class VocabularyBeanService {
 		return a.contains(b);
 	}
 	
-	@Transactional
+	/*@Transactional
 	public List<WordBean> getCategoryWordBeans(String categoryName) {		
 		List<WordBean> wordBeans = new ArrayList<>();
 		Category category = this.modelService.getCategoryByCategoryName(categoryName);
@@ -214,6 +216,24 @@ public class VocabularyBeanService {
 		}
 
 		return wordBeans;
+	}*/
+	
+	public List<UserWordBean> getCategoryWordBeans(String categoryName, Integer userId) {
+		List<UserWordBean> userWords = new ArrayList<>();
+		Category category = this.modelService.getCategoryByCategoryNameAndUser(categoryName, userId);
+
+		if (category != null) {
+			List<WordCategoryMap> maps = this.modelService.getWordCategoryMapByCategory(category.getId());
+			userWords = maps.stream()
+					.map(map -> new UserWordBean(map.getWord(), map.getProficiency(), map.getListNumber()))
+					.sorted((a, b) -> {
+						return a.getWordString().compareTo(b.getWordString());
+					})
+					.collect(Collectors.toList());
+
+		}
+
+		return userWords;
 	}
 	
 }

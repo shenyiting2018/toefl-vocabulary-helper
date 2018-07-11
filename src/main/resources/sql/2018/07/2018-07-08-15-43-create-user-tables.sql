@@ -12,7 +12,7 @@ CREATE TABLE user(
 	first_name CHAR(255) NOT NULL,
 	last_name CHAR(255) NOT NULL,
 	password CHAR(255) NOT NULL,
-	status_code int NOT NULL,
+	status_code int NOT NULL default 1,
 	UNIQUE KEY(email),
 	PRIMARY KEY(id)
 ) ENGINE INNODB

@@ -33,10 +33,10 @@ public class BatchController {
 		}
 	}
 	
-	@RequestMapping(path="/greCSV/{fileName}/{categoryName}", method=RequestMethod.POST)
-	public AjaxResponse importGRECSV(@PathVariable String fileName, @PathVariable String categoryName) throws ResourceDuplicatedException, ResourceNotFoundException {
+	@RequestMapping(path="/greCSV/{fileName}/{categoryName}/{replaceWordMeaning}", method=RequestMethod.POST)
+	public AjaxResponse importGRECSV(@PathVariable String fileName, @PathVariable String categoryName, @PathVariable String replaceWordMeaning) throws ResourceDuplicatedException, ResourceNotFoundException {
 		try {
-			int count = wordCsvImporter.importWordCSV(fileName, categoryName);
+			int count = wordCsvImporter.importWordCSV(fileName, categoryName, "true".equals(replaceWordMeaning));
 			return AjaxResponse.successResponseWithMsg(String.format("Imported successfully, %s entries processed", count));
 		} catch (IOException e) {
 			return AjaxResponse.errorResponseWithMsg(e.getMessage());

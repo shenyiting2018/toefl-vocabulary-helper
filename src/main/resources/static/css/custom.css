@@ -39,3 +39,7 @@ tr.shown td.details-control {
 .login-register-button {
 	width: 80%;
 }
+
+.column-button {
+	width: 100%;
+}

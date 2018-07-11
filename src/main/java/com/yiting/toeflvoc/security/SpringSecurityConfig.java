@@ -38,6 +38,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 				"/production/**",
 				"/pages/**",
 				"/templates/**",
+				"/batch/**",
 				"/build/**")
 			.permitAll()
 			.antMatchers("/admin/**").hasAnyRole("ADMIN")

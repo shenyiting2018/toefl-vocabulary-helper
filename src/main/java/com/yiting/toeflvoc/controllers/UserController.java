@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.yiting.toeflvoc.models.User;
 import com.yiting.toeflvoc.services.UserService;
 
 @Controller
@@ -18,10 +17,11 @@ public class UserController {
 	public String register(@RequestParam String email,
 			@RequestParam String firstName,
 			@RequestParam String lastName,
+			@RequestParam String invitationCode,
 			@RequestParam String password,
 			@RequestParam String retypePassword) throws Exception{
 
-		User user = this.userService.registerUser(email, password, retypePassword, firstName, lastName);
+		this.userService.registerUser(email, password, retypePassword, firstName, lastName, invitationCode);
 		return "pages/login";
 	}
 }

@@ -19,17 +19,17 @@ import com.yiting.toeflvoc.utils.StringListConverter;
 public class Word {
 	@Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Integer id;
+    protected Integer id;
 	
 	@NotNull
 	@Size(max = 255)
 	@Column(name="word_string", unique=true)
-	private String wordString;
+	protected String wordString;
 	
 	@NotNull
 	@Column(name="meanings")
 	@Convert(converter = StringListConverter.class)
-	private List<String> meanings;
+	protected List<String> meanings;
 
 	public Integer getId() {
 		return id;

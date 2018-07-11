@@ -14,6 +14,7 @@ function init_Kill3000DataTables() {
 				fnDrawCallback: function(e) {
 					hiddenButtonHandler();
 					detailsControlButtonHandler();
+					proficiencyHandler();
 				},
 				columnDefs: [
 					    { "visible": false, "targets": 1 }
@@ -84,6 +85,7 @@ var hiddenButtonHandler = function() {
 		}
 	});
 }
+
 
 var detailsControlButtonHandler = function(table) {
 	$('.details-control').off('click');
@@ -208,6 +210,7 @@ var detailsControlButtonHandler = function(table) {
 	    } );
 }
 
+
 var subRowFormatter = function(wordBean) {
 	 // `d` is the original data object for the row
 	var wordRootMaps = wordBean.wordRootMaps;
@@ -237,6 +240,79 @@ var subRowFormatter = function(wordBean) {
 		   '</div>';
 }
 
+
+var proficiencyHandler = function() {
+	$('.prof-button').off('click');
+	$('.prof-button').on('click', function(event) {
+		var target = $(event.target);
+		var wordId = target.attr('word-id');
+		var categoryName = 'kill-3000';
+		var newProficiency = target.attr('value');
+		var toReplaceButton = target.closest('.proficiency-dropdown').find('button')[0];
+		var oldProficiency = toReplaceButton.value;
+		
+		if (newProficiency !== oldProficiency) {
+			param = {
+				wordIdStr: wordId,
+				categoryName: categoryName,
+				proficiency: newProficiency
+			};
+			
+			$.post('/toefl/vocabularies/update-proficiency', param, function(data, status) {
+				if (status === 'success') {
+					if (data.status === 'success') {
+						var newButton = '<button type="button" class="btn btn-' 
+							  + getColor(newProficiency) + ' dropdown-toggle column-button selected" data-toggle="dropdown" '
+							  + 'value="' + newProficiency + '">'
+							  + newProficiency + '     '
+						  + '<span class="caret"></span></button>';
+						$(toReplaceButton).replaceWith(newButton);
+					} else {
+						console.log('error');
+					}
+				} else {
+					console.log('error');
+				}
+			});
+		}
+	});
+}
+
+
+var buildProficiencyDropdown = function(currentProficiency, wordId) {
+	
+	return '<div class="dropdown proficiency-dropdown">'
+	  + '<button type="button" class="btn btn-' 
+		  + getColor(currentProficiency) + ' dropdown-toggle column-button selected" data-toggle="dropdown" '
+		  + 'value="' + currentProficiency + '">'
+		  + currentProficiency + '     '
+	  + '<span class="caret"></span></button>'
+	  + '<ul class="dropdown-menu">'
+		  + '<li><button class="btn btn-primary column-button prof-button" value="4" word-id=' + wordId + ' href="#">4</button></li>'
+		  + '<li class="divider"></li>'
+		  + '<li><button class="btn btn-success column-button prof-button" value="3"  word-id=' + wordId + ' href="#">3</button></li>'
+		  + '<li><button class="btn btn-info column-button prof-button" value="2" word-id=' + wordId + ' href="#">2</button></li>'
+		  + '<li><button class="btn btn-warning column-button prof-button" value="1" word-id=' + wordId + ' href="#">1</button></li>'
+		  + '<li class="divider"></li>'
+		  + '<li><button class="btn btn-danger column-button prof-button" value="0" word-id=' + wordId + ' href="#">0</button></li>'
+	  + '</div>'
+  + '</div>';
+}
+
+var getColor = function(proficiency) {
+	if (proficiency == 4) {
+		return 'primary';
+	} else if (proficiency == 3) {
+		return 'success';
+	} else if (proficiency == 2) {
+		return 'info';
+	} else if (proficiency == 1) {
+		return 'warning';
+	} else {
+		return 'danger';
+	}
+}
+
 $(document).ready(function() {
 	init_Kill3000DataTables(hiddenButtonHandler);
 	
@@ -250,7 +326,9 @@ $(document).ready(function() {
 			+ '</span>'
 			
 			numberButton = '<button class="btn btn-success  btn-circle details-control">' + number + '</button>';
-			node = dt.row.add([numberButton, word.id, '<b>' + word.wordString + '</b>', wordMeanings]);
+			
+			wordProficiency = buildProficiencyDropdown(word.proficiency, word.id);
+			node = dt.row.add([numberButton, word.id, '<b>' + word.wordString + '</b>', wordMeanings, wordProficiency]);
 			number += 1;
 		}
 

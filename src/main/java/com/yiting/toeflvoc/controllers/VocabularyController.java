@@ -2,6 +2,8 @@ package com.yiting.toeflvoc.controllers;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.yiting.toeflvoc.beans.AnalyzeResultBean;
 import com.yiting.toeflvoc.beans.RootBean;
+import com.yiting.toeflvoc.beans.UserBean;
+import com.yiting.toeflvoc.beans.UserWordBean;
 import com.yiting.toeflvoc.beans.WordBean;
 import com.yiting.toeflvoc.models.RootAliasMap;
-import com.yiting.toeflvoc.models.Word;
 import com.yiting.toeflvoc.services.VocabularyBeanService;
 import com.yiting.toeflvoc.services.VocabularyModelService;
 import com.yiting.toeflvoc.utils.AjaxResponse;
+import com.yiting.toeflvoc.utils.RequestUtils;
 import com.yiting.toeflvoc.utils.ResourceNotFoundException;
 
 @RestController
@@ -104,9 +108,10 @@ public class VocabularyController {
 	}
 	
 	@RequestMapping(path="/categoryWords/{categoryName}", method=RequestMethod.GET)
-	public @ResponseBody AjaxResponse getCategoryWords(@PathVariable String categoryName) {
+	public @ResponseBody AjaxResponse getCategoryWords(HttpServletRequest request, @PathVariable String categoryName) {
 		long t1 = System.currentTimeMillis();
-		List<Word> words = modelService.getCategoryWords(categoryName);
+		UserBean user = RequestUtils.getUserBeanFromRequest(request);
+		List<UserWordBean> words = beanService.getCategoryWordBeans(categoryName, user.getId());
 		//List<WordBean> words = this.beanService.getCategoryWordBeans(categoryName);
 		logger.info(String.format("Bean retrieved in millis: %s", (System.currentTimeMillis() - t1)));
 		AjaxResponse resp = AjaxResponse.successResponse();
@@ -126,6 +131,18 @@ public class VocabularyController {
 		AjaxResponse resp = AjaxResponse.successResponse();
 		resp.putData("data", beans);
 		return resp;
+	}
+	
+	@RequestMapping(path="/update-proficiency", method=RequestMethod.POST)
+	public @ResponseBody AjaxResponse updateProficiency(
+			HttpServletRequest request,
+			@RequestParam String wordIdStr, 
+			@RequestParam String categoryName,
+			@RequestParam String proficiency) {
+		UserBean user = RequestUtils.getUserBeanFromRequest(request);
+		this.modelService.updateProficiency(Integer.valueOf(wordIdStr), categoryName, user.getId(), Integer.valueOf(proficiency));
+		
+		return AjaxResponse.successResponse();
 	}
 	
 }

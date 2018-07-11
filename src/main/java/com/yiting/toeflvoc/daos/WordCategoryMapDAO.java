@@ -64,4 +64,8 @@ public class WordCategoryMapDAO {
 				.setParameter("wordId", wordId)
 				.getResultList();
 	}
+	
+	public void save(WordCategoryMap map) {
+		this.wordCategoryMapRepo.save(map);
+	}
 }

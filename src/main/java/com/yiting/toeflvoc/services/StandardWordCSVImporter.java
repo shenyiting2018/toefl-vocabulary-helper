@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
@@ -18,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.yiting.toeflvoc.models.Category;
+import com.yiting.toeflvoc.models.User;
 import com.yiting.toeflvoc.models.Word;
 import com.yiting.toeflvoc.utils.PropertyManager;
 import com.yiting.toeflvoc.utils.ResourceDuplicatedException;
@@ -36,10 +36,13 @@ public class StandardWordCSVImporter {
     private VocabularyModelService vocabularyService;
     
     @Autowired
+    private UserService userService;
+    
+    @Autowired
     private PropertyManager propertyManager;
 	
     @Transactional
-	public int importWordCSV(String fileName, String categoryName) throws IOException, ResourceDuplicatedException, ResourceNotFoundException {
+	public int importWordCSV(String fileName, String categoryName, boolean replaceWordMeaning) throws IOException, ResourceDuplicatedException, ResourceNotFoundException {
 		logger.info(String.format("Start importing %s", fileName));
 		String location = this.propertyManager.getCsvFilePath() + fileName;
 		
@@ -49,7 +52,8 @@ public class StandardWordCSVImporter {
 		Iterable<CSVRecord> records = CSVFormat.newFormat('|').parse(in);
 		int number = 0;
 		
-		Category category = this.vocabularyService.getCategoryByCategoryName(categoryName);
+		User superUser = userService.getSuperuser();
+		Category category = this.vocabularyService.getCategoryByCategoryNameAndUser(categoryName, superUser.getId());
 		
 		for (CSVRecord record : records) {
 			Iterator<String> columns = record.iterator();
@@ -72,7 +76,7 @@ public class StandardWordCSVImporter {
 			Word word = vocabularyService.getWordByWordString(wordString);
 
 			if (word != null) {
-				if (word.getMeanings().isEmpty() || (word.getMeanings().size() == 1 && word.getMeanings().get(0).isEmpty())) {
+				if (replaceWordMeaning || word.getMeanings().isEmpty() || (word.getMeanings().size() == 1 && word.getMeanings().get(0).isEmpty())) {
 					this.vocabularyService.replaceWordMeanings(word, meanings, number);
 				} 
 			} else {

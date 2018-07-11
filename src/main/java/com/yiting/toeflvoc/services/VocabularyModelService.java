@@ -24,6 +24,7 @@ import com.yiting.toeflvoc.models.Alias;
 import com.yiting.toeflvoc.models.Category;
 import com.yiting.toeflvoc.models.Root;
 import com.yiting.toeflvoc.models.RootAliasMap;
+import com.yiting.toeflvoc.models.User;
 import com.yiting.toeflvoc.models.Word;
 import com.yiting.toeflvoc.models.WordCategoryMap;
 import com.yiting.toeflvoc.models.WordRootMap;
@@ -68,6 +69,16 @@ public class VocabularyModelService {
 		}
 		
 		return alias;
+	}
+	
+	@Transactional(readOnly = false)
+	public Category addCategory(String categoryName, User user) {
+		Category category = this.getCategoryByCategoryNameAndUser(categoryName, user.getId());
+		if (category == null) {
+			category = this.categoryDAO.addCategory(categoryName, user);
+		}
+		
+		return category;
 	}
 
 	@Transactional(readOnly = false)
@@ -260,10 +271,10 @@ public class VocabularyModelService {
 	}
 	
 	@Transactional
-	public Category getCategoryByCategoryName(String categoryName) {
+	public Category getCategoryByCategoryNameAndUser(String categoryName, Integer userId) {
 		Category category = null;
 		try {
-			category = this.categoryDAO.getCategoryByCategoryString(categoryName);
+			category = this.categoryDAO.getCategoryByUserIdAndName(userId, categoryName);
 		} catch (NoResultException e) {
 		
 		}
@@ -271,10 +282,21 @@ public class VocabularyModelService {
 		return category;
 	}
 	
+	@Transactional
+	public List<Category> getUserCategories(Integer userId) {
+		List<Category> categories = null;
+		try {
+			categories = this.categoryDAO.getCategoryByUserId(userId);
+		} catch (NoResultException e) {
+		
+		}
+		
+		return categories;
+	}
 
-	public List<Word> getCategoryWords(String categoryName) {		
+	public List<Word> getCategoryWords(String categoryName, Integer userId) {		
 		List<Word> words = new ArrayList<>();
-		Category category = this.getCategoryByCategoryName(categoryName);
+		Category category = this.getCategoryByCategoryNameAndUser(categoryName, userId);
 
 		if (category != null) {
 			List<WordCategoryMap> maps = this.getWordCategoryMapByCategory(category.getId());
@@ -320,6 +342,16 @@ public class VocabularyModelService {
 		}
 
 		return wordRootMap;
+	}
+	
+	@Transactional(readOnly=false)
+	public boolean updateProficiency(Integer wordId, String categoryName, Integer userId, int proficiency) {
+		Category category = this.getCategoryByCategoryNameAndUser(categoryName, userId);
+		WordCategoryMap wcm = this.getWordCategoryMapByWordIdAndCategory(wordId, category.getId());
+		wcm.setProficiency(proficiency);
+		this.wordCategoryMapDAO.save(wcm);
+		
+		return true;
 	}
 	
 	@Transactional
