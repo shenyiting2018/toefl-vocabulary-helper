@@ -119,6 +119,18 @@ public class VocabularyController {
 		return resp;
 	}
 	
+	@RequestMapping(path="/additionalWords", method=RequestMethod.GET)
+	public @ResponseBody AjaxResponse getGREAdditionalWords(HttpServletRequest request) {
+		long t1 = System.currentTimeMillis();
+		UserBean user = RequestUtils.getUserBeanFromRequest(request);
+		List<UserWordBean> words = beanService.getGREAdditionalWordBeans(user.getId());
+		//List<WordBean> words = this.beanService.getCategoryWordBeans(categoryName);
+		logger.info(String.format("Bean retrieved in millis: %s", (System.currentTimeMillis() - t1)));
+		AjaxResponse resp = AjaxResponse.successResponse();
+		resp.putData("data", words);
+		return resp;
+	}
+	
 	@RequestMapping(path="/analyze", method=RequestMethod.GET)
 	public @ResponseBody AjaxResponse analyzeRootForWord(@RequestParam String wordString) {
 		List<AnalyzeResultBean> beans;
@@ -143,6 +155,23 @@ public class VocabularyController {
 		this.modelService.updateProficiency(Integer.valueOf(wordIdStr), categoryName, user.getId(), Integer.valueOf(proficiency));
 		
 		return AjaxResponse.successResponse();
+	}
+	
+	@RequestMapping(path="/add-user-word", method=RequestMethod.POST)
+	public @ResponseBody AjaxResponse addUserWord(
+			HttpServletRequest request,
+			@RequestParam(name="word") String wordString, 
+			@RequestParam(name="meaning") String meaning,
+			@RequestParam(name="category") String categoryName) {
+		
+		UserBean user = RequestUtils.getUserBeanFromRequest(request);
+		//this.modelService.updateProficiency(Integer.valueOf(wordIdStr), categoryName, user.getId(), Integer.valueOf(proficiency));
+		UserWordBean userWordBean = this.modelService.addUserWord(wordString, meaning, categoryName, user.getId());
+		AjaxResponse resp =  AjaxResponse.successResponse();
+		
+		resp.putData("newWord", userWordBean);
+		resp.setMsg(String.format("%s added to category %s successfully!", wordString, categoryName));
+		return resp;
 	}
 	
 }

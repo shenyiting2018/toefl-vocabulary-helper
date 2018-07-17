@@ -24,7 +24,6 @@ import com.yiting.toeflvoc.models.Category;
 import com.yiting.toeflvoc.models.Role;
 import com.yiting.toeflvoc.models.User;
 import com.yiting.toeflvoc.models.Word;
-import com.yiting.toeflvoc.models.WordCategoryMap;
 
 @Service
 public class UserService implements UserDetailsService{

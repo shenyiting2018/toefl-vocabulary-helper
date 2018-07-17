@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yiting.toeflvoc.beans.UserWordBean;
 import com.yiting.toeflvoc.daos.AliasDAO;
 import com.yiting.toeflvoc.daos.CategoryDAO;
 import com.yiting.toeflvoc.daos.RootAliasMapDAO;
@@ -104,6 +105,26 @@ public class VocabularyModelService {
 		meanings.add(meaning);
 		this.rootDAO.save(root);
 		return root;
+	}
+	
+	@Transactional(readOnly = false)
+	public UserWordBean addUserWord(String wordString, String meaning, String categoryName, int userId) {
+		Category category = this.getCategoryByCategoryNameAndUser(categoryName, userId);
+		
+		Word word = this.getWordByWordString(wordString);
+		if (word == null) {
+			List<String> meaningList = new ArrayList<>();
+			meaningList.add(meaning);
+			word = this.addWord(wordString, meaningList, 0);
+			logger.info(String.format("%s added", wordString));
+		} else {
+			//word = this.addWordMeaning(word, meaning);
+			//logger.info(String.format("added new meaning to word:%s", word));
+		}
+		
+		WordCategoryMap map = this.addWordCategoryMap(word, category);
+		UserWordBean userWordBean = new UserWordBean(map.getWord(), map.getCategory(), map.getProficiency(), map.getListNumber());
+		return userWordBean;
 	}
 	
 	@Transactional(readOnly = false)

@@ -37,7 +37,7 @@ var getRootBean = function(rootId, handler, loadingDom) {
 		} else {
 			console.log('error');
 		}
-		
+
 		if (!!loadingDom) {
 			loadingDom.loading('stop');
 		}
@@ -59,7 +59,7 @@ var getWordBean = function(wordId, handler, loadingDom) {
 		} else {
 			console.log('error');
 		}	
-		
+
 		if (!!loadingDom) {
 			loadingDom.loading('stop');
 		}
@@ -71,6 +71,29 @@ var getCategoryWords = function(handler, categoryName, loadingDom) {
 		loadingDom.loading();
 	}
 	$.get('/toefl/vocabularies/categoryWords/' + categoryName, function(data, status) {
+		if (status === 'success') {
+			if (data.status === 'success') {
+				wordBeans = data.data.data;
+
+				if (!!handler) {
+					handler(wordBeans);
+				}
+			} else {
+				console.log('error');
+			}
+			loadingDom.loading('stop')
+		} else {
+			console.log('error');
+			loadingDom.loading('stop')
+		}	
+	});	
+}
+
+var getGREAdditionalWords = function(handler, loadingDom) {
+	if (!!loadingDom) {
+		loadingDom.loading();
+	}
+	$.get('/toefl/vocabularies/additionalWords/', function(data, status) {
 		if (status === 'success') {
 			if (data.status === 'success') {
 				wordBeans = data.data.data;
@@ -133,16 +156,16 @@ var analyzeWord = function(wordString, handler, loadingDom) {
 	if (!!loadingDom) {
 		loadingDom.loading();
 	}
-	
+
 	param = {
-		wordString: wordString
+			wordString: wordString
 	}
 
 	$.get('/toefl/vocabularies/analyze', param, function(data, status) {
 		if (status === 'success') {
 			if (data.status === 'success') {
 				var results = data.data.data;
-				
+
 				handler(results);
 			} else {
 				console.log('error');
@@ -150,9 +173,15 @@ var analyzeWord = function(wordString, handler, loadingDom) {
 		} else {
 			console.log('error');
 		}
-		
+
 		if (!!loadingDom) {
 			loadingDom.loading('stop');
 		}
 	});
+}
+
+var checkAddedWordValid = function(word, meaning, category) {
+	return (!!word && !!(word.trim()))
+	&& (!!meaning && !!(meaning.trim()))
+	&& (!!category && !!(category.trim()));
 }

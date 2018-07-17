@@ -1,0 +1,59 @@
+<div th:fragment="additional-word-table">
+	<div class="x_panel">
+		<div class="x_title">
+			<div class="row padding-bottom-20">
+				<form class="form-inline">
+					<div class="form-group">
+						<input type="text" class="form-control" id="word-string-input"
+							placeholder="Enter word...">
+					</div>
+					<div class="form-group">
+						<input type="text" class="form-control" id="word-meaning-input"
+							placeholder="Enter meaning...">
+					</div>
+					<div class="form-group">
+						<select id="word-category-input" type="text" class="form-control">
+							<option value="gre-blanks">GRE Blanks</option>
+							<option value="gre-readings">GRE Readings</option>
+							<option value="root-expansion">Root Expansion</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<button id="add-word-button" type="submit" class="btn btn-info">Submit</button>
+					</div>
+				</form>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<h2>Additional Words</h2>
+				</div>
+				<div class="col-md-8">
+					<button id="switch-meanings-display" class="btn btn-md btn-warning">Hide</button>
+					<button id="revert-meaning-display" class="btn btn-md btn-danger">revert</button>
+				</div>
+			</div>
+			<div
+				th:replace="fragments/panel-navbar-toolbox :: panel-navbar-toolbox"></div>
+			<div class="clearfix"></div>
+		</div>
+		<div class="x_content">
+			<p class="text-muted font-13 m-b-30"></p>
+			<table id="additional-word-table"
+				class="table table-striped table-bordered button-table">
+				<thead>
+					<tr>
+						<th>No.</th>
+						<th class="hidden">ID</th>
+						<th>Word</th>
+						<th>Meanings</th>
+						<th>Category</th>
+						<th>Proficiency</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+

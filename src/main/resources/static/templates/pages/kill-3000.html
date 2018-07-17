@@ -35,7 +35,8 @@
 	th:href="@{/vendors/bootstrap-daterangepicker/daterangepicker.css}"
 	rel="stylesheet">
 
-<link th:href="@{/vendors/jquery-loading/dist/jquery.loading.css}" rel="stylesheet"></link>
+<link th:href="@{/vendors/jquery-loading/dist/jquery.loading.css}"
+	rel="stylesheet"></link>
 
 <!-- Custom Theme Style -->
 <link th:href="@{/build/css/custom.min.css}" rel="stylesheet">
@@ -67,6 +68,9 @@
 						<div class="col-md-6 col-sm-12 col-xs-12">
 							<div th:replace="fragments/kill-3000-table :: kill-3000-table"></div>
 						</div>
+						<div class="col-md-6 col-sm-12 col-xs-12">
+							<div th:replace="fragments/additional-word-table :: additional-word-table"></div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -77,7 +81,8 @@
 		<div th:replace="fragments/copyright-footer :: copyright-footer"></div>
 	</div>
 	<div th:replace="fragments/common-js-footer :: common-js-footer"></div>
-	<script th:src="@{/vendors/datatables.net-pagination-input/js/dataTables.paginationInput.js}"></script>
+	<script
+		th:src="@{/vendors/datatables.net-pagination-input/js/dataTables.paginationInput.js}"></script>
 	<script th:src="@{/vendors/handlebars.js}"></script>
 	<script th:src="@{/js/kill-3000.js}"></script>
 

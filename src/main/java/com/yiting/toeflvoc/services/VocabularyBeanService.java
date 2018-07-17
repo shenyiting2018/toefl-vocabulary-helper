@@ -21,7 +21,6 @@ import com.yiting.toeflvoc.beans.UserWordBean;
 import com.yiting.toeflvoc.beans.WordBean;
 import com.yiting.toeflvoc.models.Category;
 import com.yiting.toeflvoc.models.RootAliasMap;
-import com.yiting.toeflvoc.models.User;
 import com.yiting.toeflvoc.models.Word;
 import com.yiting.toeflvoc.models.WordCategoryMap;
 import com.yiting.toeflvoc.models.WordRootMap;
@@ -91,7 +90,6 @@ public class VocabularyBeanService {
 		if (this.wordBeansCache.isEmpty()) {
 			long t1 = System.currentTimeMillis();
 			List<Word> allWords = this.modelService.getAllWords();
-			long t2 = System.currentTimeMillis();
 
 			for (int i = 0; i < allWords.size(); i++) {
 				Word word = allWords.get(i);
@@ -193,12 +191,12 @@ public class VocabularyBeanService {
 	private boolean match(String a, String b) {
 		return a.contains(b);
 	}
-	
+
 	/*@Transactional
 	public List<WordBean> getCategoryWordBeans(String categoryName) {		
 		List<WordBean> wordBeans = new ArrayList<>();
 		Category category = this.modelService.getCategoryByCategoryName(categoryName);
-		
+
 		List<Word> words = new ArrayList<>();
 		if (category != null) {
 			List<WordCategoryMap> maps = this.modelService.getWordCategoryMapByCategory(category.getId());
@@ -208,7 +206,7 @@ public class VocabularyBeanService {
 						return a.getWordString().compareTo(b.getWordString());
 					})
 					.collect(Collectors.toList());
-			
+
 			for (Word word : words) {
 				List<WordRootMap> wordRootMaps = this.modelService.getWordRootMapsByWord(word.getId());
 				wordBeans.add(new WordBean(word, wordRootMaps, null));
@@ -217,7 +215,7 @@ public class VocabularyBeanService {
 
 		return wordBeans;
 	}*/
-	
+
 	public List<UserWordBean> getCategoryWordBeans(String categoryName, Integer userId) {
 		List<UserWordBean> userWords = new ArrayList<>();
 		Category category = this.modelService.getCategoryByCategoryNameAndUser(categoryName, userId);
@@ -225,7 +223,7 @@ public class VocabularyBeanService {
 		if (category != null) {
 			List<WordCategoryMap> maps = this.modelService.getWordCategoryMapByCategory(category.getId());
 			userWords = maps.stream()
-					.map(map -> new UserWordBean(map.getWord(), map.getProficiency(), map.getListNumber()))
+					.map(map -> new UserWordBean(map.getWord(), map.getCategory(), map.getProficiency(), map.getListNumber()))
 					.sorted((a, b) -> {
 						return a.getWordString().compareTo(b.getWordString());
 					})
@@ -235,5 +233,33 @@ public class VocabularyBeanService {
 
 		return userWords;
 	}
-	
+
+	public List<UserWordBean> getGREAdditionalWordBeans(Integer userId) {
+		List<UserWordBean> userWords = new ArrayList<>();
+		List<Category> categories = new ArrayList<>();
+
+		Category greBlanksCategory = this.modelService.getCategoryByCategoryNameAndUser("gre-blanks", userId);
+		if (greBlanksCategory != null) categories.add(greBlanksCategory);
+
+		Category greReadingsCategory = this.modelService.getCategoryByCategoryNameAndUser("gre-readings", userId);
+		if (greReadingsCategory != null) categories.add(greReadingsCategory);
+
+		Category greRootExpansaionCategory = this.modelService.getCategoryByCategoryNameAndUser("root-expansion", userId);
+		if (greRootExpansaionCategory != null) categories.add(greRootExpansaionCategory);
+
+		for (Category category : categories) {
+			List<WordCategoryMap> maps = this.modelService.getWordCategoryMapByCategory(category.getId());
+			userWords.addAll(maps.stream()
+					.map(map -> new UserWordBean(map.getWord(), map.getCategory(), map.getProficiency(), map.getListNumber()))
+					.sorted((a, b) -> {
+						return a.getWordString().compareTo(b.getWordString());
+					})
+					.collect(Collectors.toList()));
+
+
+		}
+
+		return userWords;
+	}
+
 }
