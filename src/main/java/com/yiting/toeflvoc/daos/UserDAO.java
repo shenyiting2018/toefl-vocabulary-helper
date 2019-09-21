@@ -1,5 +1,7 @@
 package com.yiting.toeflvoc.daos;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
@@ -29,6 +31,11 @@ public class UserDAO {
 		return (User) this.entityManager.createQuery(GET_USER_BY_EMAIL)
 				.setParameter("email", email)
 				.getSingleResult();
+	}
+	
+	public List<User> getAllUsers() {
+		List<User> users = (List<User>) userRepo.findAll();
+		return users;
 	}
 
 	public Role getRoleByName(String role) throws NoResultException {

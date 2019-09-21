@@ -255,11 +255,8 @@ public class VocabularyBeanService {
 						return a.getWordString().compareTo(b.getWordString());
 					})
 					.collect(Collectors.toList()));
-
-
 		}
 
 		return userWords;
 	}
-
 }

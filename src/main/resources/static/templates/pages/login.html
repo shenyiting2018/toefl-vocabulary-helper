@@ -49,6 +49,8 @@
 					<div th:if="${param.logout}">You have been logged out.</div>
 					<form th:action="@{/login}" method="post">
 						<h1>Login</h1>
+							<p>Demo Account: <span color="red"><u>un/pwd:<b>demo</b></u></span></p>
+						
 						<div class="form-group">
 							<input type="text" class="form-control" placeholder="Username"
 								required="" name="username" />

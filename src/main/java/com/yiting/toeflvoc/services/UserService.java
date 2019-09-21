@@ -1,5 +1,6 @@
 package com.yiting.toeflvoc.services;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,17 +20,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yiting.toeflvoc.beans.UserBean;
+import com.yiting.toeflvoc.beans.UserStatsBean;
+import com.yiting.toeflvoc.daos.CategoryDAO;
 import com.yiting.toeflvoc.daos.UserDAO;
 import com.yiting.toeflvoc.models.Category;
 import com.yiting.toeflvoc.models.Role;
 import com.yiting.toeflvoc.models.User;
 import com.yiting.toeflvoc.models.Word;
+import com.yiting.toeflvoc.models.WordCategoryMap;
 
 @Service
 public class UserService implements UserDetailsService{
 
 	@Autowired
 	private UserDAO userDao;
+	
+	@Autowired
+	private CategoryDAO categoryDao;
+	
+	@Autowired
+	private VocabularyModelService vocabularyModelService;
 	
 	@Autowired
 	private VocabularyModelService modelService;
@@ -139,5 +149,63 @@ public class UserService implements UserDetailsService{
 				grantedAuthorities);
 
 		return userDetails;		
+	}
+	
+	public List<UserStatsBean> getAllUserStats() {
+		List<Category> allCategories = categoryDao.getAllCategorys();
+		List<UserStatsBean> userStats = new ArrayList<>();
+		
+		for (Category category : allCategories) {
+			if (category.getCategoryName() != "kill-3000") {
+				continue;
+			}
+			
+			List<WordCategoryMap> wordCategoryMaps = vocabularyModelService.getWordCategoryMapByCategory(category.getId());
+			
+			// Construct a userStats instance given the wordCategoryMaps, then add it to userStats
+			int level0Count = 0; 
+			int level1Count = 0;
+			int level2Count = 0;
+			int level3Count = 0;
+			int level4Count = 0;
+			int count = 0;
+			int weightedCount = 0;
+			for (WordCategoryMap wordCategoryMap : wordCategoryMaps) {
+				if (wordCategoryMap.getProficiency() == 0) {
+					level0Count++;
+				} else if (wordCategoryMap.getProficiency() == 1) {
+					level1Count++;
+				} else if (wordCategoryMap.getProficiency() == 2) {
+					level2Count++;
+				} else if (wordCategoryMap.getProficiency() == 3) {
+					level3Count++;
+				} else {
+					level4Count++;
+				}
+				
+				count++;
+				weightedCount += wordCategoryMap.getProficiency();
+			}
+			
+			int proficiencyPercentage = weightedCount * 100 / count * 4;
+			
+			userStats.add(
+				new UserStatsBean(
+					category.getUser().getId(),
+					category.getUser().getFirstName() + " " + category.getUser().getLastName(),
+					level0Count,
+					level1Count,
+					level2Count,
+					level3Count,
+					level4Count,
+					proficiencyPercentage
+				)
+			);
+		}
+		return userStats;
+	}
+	
+	public List<User> getAllUsers() {
+		return this.userDao.getAllUsers();
 	}
 }
