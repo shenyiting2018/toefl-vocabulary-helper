@@ -17,16 +17,6 @@ Website
 Features
 =======
 
-* Login/Logout
-
-* Viewing student list (with raw data)
-![](https://raw.githubusercontent.com/shenyiting2018/ruby-student-information-system/master/students-demo.png)
-* Viewing student details
-![](https://raw.githubusercontent.com/shenyiting2018/ruby-student-information-system/master/student-details-demo.png)
-* Creating/Editing student information
-![](https://raw.githubusercontent.com/shenyiting2018/ruby-student-information-system/master/student-edit-demo.png)
-* Adding new comment
-* Viewing comments by time order descending
 
 Techs applied in this project
 =======
