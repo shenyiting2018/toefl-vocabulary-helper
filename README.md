@@ -3,7 +3,7 @@ English (GRE/TOEFL) Vocabulary Builder
 Welcome! This is a vocabulary builder written by Yiting Shen. 
 When I prepared for the GRE/TOEFL tests (English-based graduate program entrance exam), I found it difficult to find a website or mobile application that supports all my needs to build my English vocabulary. Then I decided to build my own website.
 
-![](https://raw.githubusercontent.com/shenyiting2018/ruby-student-information-system/master/about-demo.png)
+![](https://raw.githubusercontent.com/shenyiting2018/toefl-vocabulary-helper/master/main-page.png)
 
 Author
 ========
