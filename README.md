@@ -11,7 +11,7 @@ Author
 
 Website
 ========
-* [https://yiting-student-manager.herokuapp.com/](https://yiting-student-manager.herokuapp.com/)
+* [http://toefl.yitingworld.com/toefl/](http://toefl.yitingworld.com/toefl/)
 * To login: demo/demo
 
 Features
@@ -31,17 +31,12 @@ Features
 Techs applied in this project
 =======
 
-* Ruby
-* Sinatra (a light-weighted web framework)
-* SQlite (for development)
-* PostgreSQL (for production)
-* DataMapper
-* Gem
-* ERB
+* Programming Language: Java
+* Data Storage: MySQL
+* Backend Frameworks: Spring MVC, Spring, Spring Data, Spring Security, Spring Boot, Maven, Hibernate
+* Template Engine: Thymeleaf
 * REST API Design
-* Bootstrap
-* HTML
-* CSS
+* Web: HTML, CSS, JavaScript, jQuery, Bootstrap, DataTable.js, Typeahead.js
 
 
 License
