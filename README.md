@@ -41,6 +41,7 @@ Techs applied in this project
 * Backend Frameworks: Spring MVC, Spring, Spring Data, Spring Security, Spring Boot, Maven, Hibernate
 * Template Engine: Thymeleaf
 * REST API Design
+* Kafka
 * Web: HTML, CSS, JavaScript, jQuery, Bootstrap, DataTable.js, Typeahead.js
 
 
